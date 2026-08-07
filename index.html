@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>STAMP CRM — Визовое сопровождение</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#16213E;
+    --navy-light:#223159;
+    --navy-lighter:#2E3E6B;
+    --paper:#EDEEE7;
+    --card:#FFFFFF;
+    --stamp-red:#A6303C;
+    --stamp-red-bg:#FBEAEA;
+    --gold:#B8933D;
+    --success:#3A7A5D;
+    --success-bg:#E7F1EB;
+    --ink:#1B1B1E;
+    --muted:#6B7280;
+    --line:#DFDDD3;
+    --radius:10px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:'IBM Plex Sans', sans-serif;
+    background:var(--paper);
+    color:var(--ink);
+    -webkit-font-smoothing:antialiased;
+  }
+  .mono{font-family:'IBM Plex Mono', monospace;}
+
+  /* ---------- Layout ---------- */
+  .app{display:grid; grid-template-columns:248px 1fr; min-height:100vh;}
+
+  /* Sidebar */
+  .sidebar{
+    background:var(--navy);
+    color:#EDEEF5;
+    padding:22px 16px;
+    display:flex; flex-direction:column;
+    position:sticky; top:0; height:100vh;
+  }
+  .brand{display:flex; align-items:center; gap:10px; padding:6px 8px 24px 8px;}
+  .stamp-mark{
+    width:34px; height:34px; border-radius:50%;
+    border:2px solid var(--gold);
+    display:flex; align-items:center; justify-content:center;
+    color:var(--gold); font-weight:700; font-size:13px;
+    font-family:'IBM Plex Mono', monospace;
+    transform:rotate(-8deg);
+    flex-shrink:0;
+  }
+  .brand-text{line-height:1.1;}
+  .brand-text .name{font-weight:700; font-size:16px; letter-spacing:0.02em;}
+  .brand-text .sub{font-size:11px; color:#9AA3C4; margin-top:2px;}
+
+  .nav{display:flex; flex-direction:column; gap:2px; margin-top:8px;}
+  .nav-item{
+    display:flex; align-items:center; gap:10px;
+    padding:10px 12px; border-radius:8px;
+    color:#C7CCE3; font-size:14px; font-weight:500;
+    cursor:pointer; border:none; background:none; text-align:left; width:100%;
+    transition:background .15s, color .15s;
+  }
+  .nav-item svg{width:17px; height:17px; opacity:.85; flex-shrink:0;}
+  .nav-item:hover{background:var(--navy-light); color:#fff;}
+  .nav-item.active{background:var(--navy-lighter); color:#fff;}
+  .nav-count{
+    margin-left:auto; font-family:'IBM Plex Mono', monospace; font-size:11px;
+    color:#8B93B8; background:rgba(255,255,255,.06); padding:1px 7px; border-radius:20px;
+  }
+
+  .sidebar-footer{
+    margin-top:auto; padding:14px 10px; border-top:1px solid var(--navy-light);
+    font-size:11px; color:#7C84AC; line-height:1.5;
+  }
+
+  /* Main */
+  .main{padding:28px 34px 60px 34px; max-width:1400px;}
+  .topbar{display:flex; align-items:flex-end; justify-content:space-between; margin-bottom:26px; flex-wrap:wrap; gap:14px;}
+  .topbar h1{font-size:22px; margin:0 0 4px 0; font-weight:700; letter-spacing:-.01em;}
+  .topbar .desc{color:var(--muted); font-size:13.5px; margin:0;}
+  .btn-primary{
+    background:var(--navy); color:#fff; border:none; padding:10px 18px;
+    border-radius:8px; font-weight:600; font-size:13.5px; cursor:pointer;
+    display:flex; align-items:center; gap:8px;
+    transition:background .15s;
+  }
+  .btn-primary:hover{background:var(--navy-light);}
+
+  .view{display:none;}
+  .view.active{display:block;}
+
+  /* ---------- Kanban ---------- */
+  .kanban{display:flex; gap:16px; overflow-x:auto; padding-bottom:14px;}
+  .kcol{flex:0 0 272px; display:flex; flex-direction:column;}
+  .kcol-head{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:0 4px 10px 4px; border-bottom:2px solid var(--line); margin-bottom:12px;
+  }
+  .kcol-head .t{font-size:12.5px; font-weight:600; text-transform:uppercase; letter-spacing:.04em; color:var(--navy);}
+  .kcol-head .n{font-family:'IBM Plex Mono', monospace; font-size:11px; color:var(--muted); background:#fff; border:1px solid var(--line); padding:1px 7px; border-radius:20px;}
+  .kcards{display:flex; flex-direction:column; gap:10px; min-height:40px;}
+
+  .card{
+    background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
+    padding:13px 14px; cursor:pointer; position:relative; overflow:hidden;
+    transition:box-shadow .15s, transform .15s;
+  }
+  .card:hover{box-shadow:0 4px 14px rgba(22,33,62,.10); transform:translateY(-1px);}
+  .card-top{display:flex; align-items:center; gap:8px; margin-bottom:8px;}
+  .flag{font-size:17px;}
+  .card-name{font-weight:600; font-size:13.5px; flex:1;}
+  .card-meta{font-size:11.5px; color:var(--muted); margin-bottom:9px;}
+  .card-row{display:flex; align-items:center; justify-content:space-between; margin-top:8px;}
+  .badge{
+    font-family:'IBM Plex Mono', monospace; font-size:10px; font-weight:600;
+    padding:3px 7px; border-radius:5px; letter-spacing:.02em;
+  }
+  .badge-visa{background:#EFF1F8; color:var(--navy-lighter);}
+  .badge-warn{background:var(--stamp-red-bg); color:var(--stamp-red);}
+  .badge-ok{background:var(--success-bg); color:var(--success);}
+  .avatar{
+    width:22px; height:22px; border-radius:50%; background:var(--navy);
+    color:#fff; font-size:9.5px; font-weight:700; display:flex; align-items:center; justify-content:center;
+    font-family:'IBM Plex Mono', monospace;
+  }
+  .track{font-family:'IBM Plex Mono', monospace; font-size:10.5px; color:var(--muted);}
+
+  .stamp-flag{
+    position:absolute; top:8px; right:-26px; width:110px; text-align:center;
+    transform:rotate(38deg); font-family:'IBM Plex Mono', monospace; font-size:9px; font-weight:700;
+    letter-spacing:.06em; padding:2px 0; border-top:1.5px solid; border-bottom:1.5px solid;
+    opacity:.9; pointer-events:none;
+  }
+  .stamp-flag.red{color:var(--stamp-red); border-color:var(--stamp-red);}
+  .stamp-flag.green{color:var(--success); border-color:var(--success);}
+
+  /* ---------- Tables ---------- */
+  .panel{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); overflow:hidden;}
+  table{width:100%; border-collapse:collapse; font-size:13.5px;}
+  thead th{
+    text-align:left; font-size:11px; text-transform:uppercase; letter-spacing:.04em; color:var(--muted);
+    padding:12px 16px; border-bottom:1px solid var(--line); background:#FAFAF7; font-weight:600;
+  }
+  tbody td{padding:13px 16px; border-bottom:1px solid var(--line); vertical-align:middle;}
+  tbody tr:last-child td{border-bottom:none;}
+  tbody tr{transition:background .12s;}
+  tbody tr:hover{background:#FAFAF8;}
+  .cell-main{font-weight:600;}
+  .cell-sub{color:var(--muted); font-size:12px; margin-top:2px;}
+  .pill{
+    font-family:'IBM Plex Mono', monospace; font-size:10.5px; font-weight:600;
+    padding:3px 9px; border-radius:20px; display:inline-block;
+  }
+  .pill-active{background:var(--success-bg); color:var(--success);}
+  .pill-review{background:#FFF3E0; color:#9A6A11;}
+  .pill-archive{background:#EEE; color:#666;}
+
+  /* Doc list */
+  .doc-type{display:flex; align-items:center; gap:9px;}
+  .doc-ico{width:28px; height:28px; border-radius:6px; background:#EFF1F8; color:var(--navy-lighter); display:flex; align-items:center; justify-content:center; font-size:13px;}
+
+  /* Modal */
+  .overlay{
+    position:fixed; inset:0; background:rgba(22,33,62,.45); display:none;
+    align-items:center; justify-content:center; z-index:50; padding:20px;
+  }
+  .overlay.active{display:flex;}
+  .modal{
+    background:#fff; border-radius:14px; width:100%; max-width:460px; padding:28px;
+    position:relative; box-shadow:0 20px 60px rgba(0,0,0,.25);
+  }
+  .modal-close{position:absolute; top:16px; right:16px; background:none; border:none; cursor:pointer; color:var(--muted); font-size:18px;}
+  .modal h2{margin:0 0 4px 0; font-size:18px;}
+  .modal .sub{color:var(--muted); font-size:12.5px; margin-bottom:18px;}
+  .kv{display:flex; justify-content:space-between; padding:9px 0; border-bottom:1px solid var(--line); font-size:13px;}
+  .kv:last-of-type{border-bottom:none;}
+  .kv .k{color:var(--muted);}
+  .kv .v{font-weight:600; text-align:right;}
+  .stamp-big{
+    display:inline-flex; align-items:center; gap:6px; margin-top:16px; padding:8px 12px;
+    border-radius:8px; font-family:'IBM Plex Mono', monospace; font-size:12px; font-weight:700;
+    letter-spacing:.03em;
+  }
+
+  ::-webkit-scrollbar{height:8px; width:8px;}
+  ::-webkit-scrollbar-thumb{background:#C9C7BB; border-radius:20px;}
+
+  @media (max-width:820px){
+    .app{grid-template-columns:1fr;}
+    .sidebar{position:relative; height:auto; flex-direction:row; align-items:center; overflow-x:auto;}
+    .brand{padding:6px 14px 6px 0;}
+    .nav{flex-direction:row;}
+    .sidebar-footer{display:none;}
+    .main{padding:20px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="stamp-mark">СВ</div>
+      <div class="brand-text">
+        <div class="name">STAMP CRM</div>
+        <div class="sub">Визовое сопровождение</div>
+      </div>
+    </div>
+    <nav class="nav">
+      <button class="nav-item active" data-view="kanban">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="7" height="16" rx="1"/><rect x="14" y="4" width="7" height="9" rx="1"/></svg>
+        Воронка заявок <span class="nav-count">14</span>
+      </button>
+      <button class="nav-item" data-view="citizens">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.5-7 8-7s8 3 8 7"/></svg>
+        Иностранные граждане <span class="nav-count">9</span>
+      </button>
+      <button class="nav-item" data-view="clients">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21V7l7-4 7 4v14"/><path d="M10 21v-6h4v6"/></svg>
+        Клиенты <span class="nav-count">6</span>
+      </button>
+      <button class="nav-item" data-view="docs">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+        Документы <span class="nav-count">21</span>
+      </button>
+    </nav>
+    <div class="sidebar-footer mono">
+      MVP DEMO · v0.1<br>для показа заказчику
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+
+    <!-- KANBAN VIEW -->
+    <section class="view active" id="view-kanban">
+      <div class="topbar">
+        <div>
+          <h1>Воронка заявок</h1>
+          <p class="desc">Жизненный цикл заявки от первичных данных до выдачи визы</p>
+        </div>
+        <button class="btn-primary">+ Новая заявка</button>
+      </div>
+      <div class="kanban" id="kanbanBoard"></div>
+    </section>
+
+    <!-- CITIZENS VIEW -->
+    <section class="view" id="view-citizens">
+      <div class="topbar">
+        <div>
+          <h1>Иностранные граждане</h1>
+          <p class="desc">ФИО, гражданство, паспортные данные, цель въезда</p>
+        </div>
+        <button class="btn-primary">+ Добавить гражданина</button>
+      </div>
+      <div class="panel">
+        <table>
+          <thead><tr>
+            <th>ФИО</th><th>Гражданство</th><th>Паспорт</th><th>Срок действия</th><th>Цель въезда</th><th>Статус</th>
+          </tr></thead>
+          <tbody id="citizensBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- CLIENTS VIEW -->
+    <section class="view" id="view-clients">
+      <div class="topbar">
+        <div>
+          <h1>Клиенты</h1>
+          <p class="desc">Компании-заказчики визового сопровождения</p>
+        </div>
+        <button class="btn-primary">+ Добавить клиента</button>
+      </div>
+      <div class="panel">
+        <table>
+          <thead><tr>
+            <th>Компания</th><th>БИН</th><th>Контактное лицо</th><th>Телефон / Email</th><th>Активных заявок</th>
+          </tr></thead>
+          <tbody id="clientsBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- DOCS VIEW -->
+    <section class="view" id="view-docs">
+      <div class="topbar">
+        <div>
+          <h1>Документы</h1>
+          <p class="desc">Файлы, привязанные к заявкам: паспорта, страховки, гарантийные письма</p>
+        </div>
+        <button class="btn-primary">+ Загрузить документ</button>
+      </div>
+      <div class="panel">
+        <table>
+          <thead><tr>
+            <th>Документ</th><th>Заявка</th><th>Гражданин</th><th>Загружен</th><th>Статус</th>
+          </tr></thead>
+          <tbody id="docsBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- Card modal -->
+<div class="overlay" id="overlay">
+  <div class="modal" id="modalBody"></div>
+</div>
+
+<script>
+const managers = {
+  "АК":"Айгуль Касымова","ДТ":"Данияр Токтаров","МЖ":"Мадина Жумабекова"
+};
+
+const citizens = [
+  {name:"Раджеш Кумар", flag:"🇮🇳", country:"Индия", passport:"N7724581", expiry:"2026-09-14", dob:"1988-03-11", gender:"М", purpose:"Работа (шеф-монтаж)"},
+  {name:"Ахмет Йылмаз", flag:"🇹🇷", country:"Турция", passport:"U19042871", expiry:"2027-04-02", dob:"1991-07-22", gender:"М", purpose:"Деловая поездка"},
+  {name:"Диловар Рахимов", flag:"🇺🇿", country:"Узбекистан", passport:"FA3391027", expiry:"2026-08-30", dob:"1985-12-05", gender:"М", purpose:"Работа (инженер)"},
+  {name:"Ли Вэй", flag:"🇨🇳", country:"Китай", passport:"E30187522", expiry:"2028-01-19", dob:"1993-02-17", gender:"М", purpose:"Переговоры / выставка"},
+  {name:"Хана Шульц", flag:"🇩🇪", country:"Германия", passport:"C9K4X2LQ1", expiry:"2027-11-08", dob:"1990-05-30", gender:"Ж", purpose:"Работа (аудит)"},
+  {name:"Мохамед эль-Сайед", flag:"🇪🇬", country:"Египет", passport:"A24681359", expiry:"2026-10-25", dob:"1982-09-14", gender:"М", purpose:"Работа (монтаж оборудования)"},
+  {name:"Джон Уокер", flag:"🇬🇧", country:"Великобритания", passport:"567891234", expiry:"2029-03-01", dob:"1978-06-19", gender:"М", purpose:"Консалтинг"},
+  {name:"Пак Мин Джун", flag:"🇰🇷", country:"Южная Корея", passport:"M52017744", expiry:"2027-06-27", dob:"1995-01-08", gender:"М", purpose:"Работа (IT)"},
+  {name:"Анна Ковальська", flag:"🇺🇦", country:"Украина", passport:"FN118823", expiry:"2026-12-05", dob:"1992-04-25", gender:"Ж", purpose:"Работа (бухгалтер)"}
+];
+
+const clients = [
+  {name:'ТОО «СтройИнвест Казахстан»', bin:"120840012345", contact:"Ержан Абенов", phone:"+7 707 123 4567", email:"a.erzhan@siq.kz", active:3},
+  {name:'ТОО «TechnoLogistics»', bin:"090640098765", contact:"Марина Ким", phone:"+7 701 987 6543", email:"m.kim@technolog.kz", active:2},
+  {name:'АО «Каспий Энергоресурсы»', bin:"050340054321", contact:"Бауыржан Сатов", phone:"+7 702 555 1122", email:"b.satov@kaspenergo.kz", active:4},
+  {name:'ТОО «GreenField Agro»', bin:"110540011122", contact:"Гульнара Оспанова", phone:"+7 705 444 3399", email:"g.ospanova@gfagro.kz", active:1},
+  {name:'ИП «Нурланов Тимур»', bin:"780112301234", contact:"Тимур Нурланов", phone:"+7 700 222 8877", email:"t.nurlanov@mail.kz", active:1},
+  {name:'ТОО «AlmatyBuild Group»', bin:"140240076543", contact:"Сауле Дюсенова", phone:"+7 708 666 5544", email:"s.dussenova@abg.kz", active:3}
+];
+
+const docs = [
+  {type:"Паспорт (скан)", icon:"📘", app:"#VZ-1042", citizen:"Раджеш Кумар", date:"2026-07-28", status:"ok"},
+  {type:"Мед. страховка", icon:"🩺", app:"#VZ-1042", citizen:"Раджеш Кумар", date:"2026-07-28", status:"ok"},
+  {type:"Гарантийное письмо", icon:"✉️", app:"#VZ-1039", citizen:"Диловар Рахимов", date:"2026-07-25", status:"review"},
+  {type:"Паспорт (скан)", icon:"📘", app:"#VZ-1039", citizen:"Диловар Рахимов", date:"2026-07-25", status:"warn"},
+  {type:"Фото 3.5×4.5", icon:"🖼️", app:"#VZ-1035", citizen:"Ахмет Йылмаз", date:"2026-07-20", status:"ok"},
+  {type:"Анкета-приглашение", icon:"📄", app:"#VZ-1035", citizen:"Ахмет Йылмаз", date:"2026-07-21", status:"ok"},
+  {type:"Паспорт (скан)", icon:"📘", app:"#VZ-1028", citizen:"Ли Вэй", date:"2026-07-10", status:"ok"},
+  {type:"Трудовой договор", icon:"📑", app:"#VZ-1028", citizen:"Ли Вэй", date:"2026-07-11", status:"ok"}
+];
+
+const columns = [
+  {key:"new", title:"Новая заявка"},
+  {key:"collect", title:"Сбор документов"},
+  {key:"prepare", title:"Подготовка документов"},
+  {key:"submit", title:"Подача и согласование"},
+  {key:"wait", title:"Ожидание решения"},
+  {key:"done", title:"Завершено"}
+];
+
+const applications = [
+  {id:"VZ-1042", citizen:citizens[0], stage:"new", visaType:"Рабочая, однократная", manager:"АК", client:"ТОО «СтройИнвест Казахстан»", entryCity:"—"},
+  {id:"VZ-1044", citizen:citizens[5], stage:"new", visaType:"Рабочая, однократная", manager:"МЖ", client:'АО «Каспий Энергоресурсы»', entryCity:"—"},
+  {id:"VZ-1045", citizen:citizens[8], stage:"new", visaType:"Рабочая, многократная", manager:"ДТ", client:'ТОО «GreenField Agro»', entryCity:"—"},
+
+  {id:"VZ-1039", citizen:citizens[2], stage:"collect", visaType:"Рабочая, однократная", manager:"АК", client:'ТОО «СтройИнвест Казахстан»', entryCity:"Алматы"},
+  {id:"VZ-1040", citizen:citizens[6], stage:"collect", visaType:"Деловая, многократная", manager:"МЖ", client:'ИП «Нурланов Тимур»', entryCity:"Астана"},
+
+  {id:"VZ-1035", citizen:citizens[1], stage:"prepare", visaType:"Деловая, однократная", manager:"ДТ", client:'ТОО «TechnoLogistics»', entryCity:"Алматы"},
+  {id:"VZ-1036", citizen:citizens[4], stage:"prepare", visaType:"Рабочая, однократная", manager:"АК", client:'АО «Каспий Энергоресурсы»', entryCity:"Астана"},
+
+  {id:"VZ-1028", citizen:citizens[3], stage:"submit", visaType:"Деловая, многократная", manager:"МЖ", client:'ТОО «TechnoLogistics»', entryCity:"Алматы", track:"ВМП-88213К"},
+  {id:"VZ-1030", citizen:citizens[7], stage:"submit", visaType:"Рабочая, однократная", manager:"ДТ", client:'ТОО «AlmatyBuild Group»', entryCity:"Шымкент", track:"ВМП-88240К"},
+
+  {id:"VZ-1019", citizen:citizens[8], stage:"wait", visaType:"Рабочая, однократная", manager:"АК", client:'ТОО «GreenField Agro»', entryCity:"Алматы", track:"ВМП-87910К"},
+  {id:"VZ-1021", citizen:citizens[6], stage:"wait", visaType:"Деловая, однократная", manager:"МЖ", client:'ИП «Нурланов Тимур»', entryCity:"Астана", track:"ВМП-87955К"},
+  {id:"VZ-1022", citizen:citizens[3], stage:"wait", visaType:"Деловая, многократная", manager:"ДТ", client:'ТОО «TechnoLogistics»', entryCity:"Алматы", track:"ВМП-87961К"},
+
+  {id:"VZ-0998", citizen:citizens[0], stage:"done", visaType:"Рабочая, однократная", manager:"АК", client:'ТОО «СтройИнвест Казахстан»', entryCity:"Алматы", track:"ВМП-86440К"},
+  {id:"VZ-1001", citizen:citizens[4], stage:"done", visaType:"Рабочая, однократная", manager:"МЖ", client:'АО «Каспий Энергоресурсы»', entryCity:"Астана", track:"ВМП-86502К"}
+];
+
+function monthsUntil(dateStr){
+  const now = new Date("2026-08-07");
+  const d = new Date(dateStr);
+  return (d - now) / (1000*60*60*24*30.44);
+}
+
+function fmtDate(s){
+  const [y,m,d] = s.split("-");
+  return `${d}.${m}.${y}`;
+}
+
+function renderKanban(){
+  const board = document.getElementById('kanbanBoard');
+  board.innerHTML = '';
+  columns.forEach(col=>{
+    const apps = applications.filter(a=>a.stage===col.key);
+    const colEl = document.createElement('div');
+    colEl.className = 'kcol';
+    colEl.innerHTML = `
+      <div class="kcol-head"><span class="t">${col.title}</span><span class="n">${apps.length}</span></div>
+      <div class="kcards"></div>
+    `;
+    const cardsEl = colEl.querySelector('.kcards');
+    apps.forEach(a=>{
+      const mo = monthsUntil(a.citizen.expiry);
+      const warn = mo < 6;
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.onclick = ()=>openModal(a);
+      card.innerHTML = `
+        ${col.key==='new' && warn ? `<div class="stamp-flag red">ПАСПОРТ &lt; 6 МЕС</div>` : ''}
+        <div class="card-top">
+          <span class="flag">${a.citizen.flag}</span>
+          <span class="card-name">${a.citizen.name}</span>
+        </div>
+        <div class="card-meta mono">#${a.id} · ${a.client.length>28 ? a.client.slice(0,26)+'…' : a.client}</div>
+        <div class="card-row">
+          <span class="badge badge-visa">${a.visaType.split(',')[0]}</span>
+          ${a.track ? `<span class="track">${a.track}</span>` : `<span class="badge ${warn?'badge-warn':'badge-ok'}">${warn?'СРОК ПАСПОРТА':'ОК'}</span>`}
+        </div>
+        <div class="card-row">
+          <span class="mono track">${a.entryCity}</span>
+          <span class="avatar" title="${managers[a.manager]}">${a.manager}</span>
+        </div>
+      `;
+      cardsEl.appendChild(card);
+    });
+    board.appendChild(colEl);
+  });
+}
+
+function openModal(a){
+  const mo = monthsUntil(a.citizen.expiry);
+  const warn = mo < 6;
+  const stageTitle = columns.find(c=>c.key===a.stage).title;
+  const modal = document.getElementById('modalBody');
+  modal.innerHTML = `
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <h2>${a.citizen.flag} ${a.citizen.name}</h2>
+    <div class="sub">Заявка #${a.id} · ${stageTitle}</div>
+    <div class="kv"><span class="k">Клиент</span><span class="v">${a.client}</span></div>
+    <div class="kv"><span class="k">Гражданство</span><span class="v">${a.citizen.country}</span></div>
+    <div class="kv"><span class="k">Паспорт</span><span class="v mono">${a.citizen.passport}</span></div>
+    <div class="kv"><span class="k">Действителен до</span><span class="v mono">${fmtDate(a.citizen.expiry)}</span></div>
+    <div class="kv"><span class="k">Тип визы</span><span class="v">${a.visaType}</span></div>
+    <div class="kv"><span class="k">Город консульства</span><span class="v">${a.entryCity}</span></div>
+    <div class="kv"><span class="k">Ответственный</span><span class="v">${managers[a.manager]}</span></div>
+    ${a.track ? `<div class="kv"><span class="k">Трек-номер ВМП</span><span class="v mono">${a.track}</span></div>` : ''}
+    ${warn
+      ? `<div class="stamp-big" style="background:var(--stamp-red-bg); color:var(--stamp-red);">⛔ ВАЛИДАТОР: паспорт истекает менее чем через 6 мес — переход заблокирован</div>`
+      : `<div class="stamp-big" style="background:var(--success-bg); color:var(--success);">✔ Срок действия паспорта в норме</div>`
+    }
+  `;
+  document.getElementById('overlay').classList.add('active');
+}
+function closeModal(){ document.getElementById('overlay').classList.remove('active'); }
+document.getElementById('overlay').addEventListener('click', e=>{ if(e.target.id==='overlay') closeModal(); });
+
+function renderCitizens(){
+  const body = document.getElementById('citizensBody');
+  body.innerHTML = citizens.map(c=>{
+    const mo = monthsUntil(c.expiry);
+    const warn = mo < 6;
+    return `<tr>
+      <td><div class="cell-main">${c.flag} ${c.name}</div><div class="cell-sub">${c.dob.split('-').reverse().join('.')} · ${c.gender}</div></td>
+      <td>${c.country}</td>
+      <td class="mono">${c.passport}</td>
+      <td><span class="mono">${fmtDate(c.expiry)}</span>${warn ? ' <span class="badge badge-warn">&lt; 6 мес</span>' : ''}</td>
+      <td>${c.purpose}</td>
+      <td><span class="pill ${warn ? 'pill-review' : 'pill-active'}">${warn ? 'Требует внимания' : 'В работе'}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+function renderClients(){
+  const body = document.getElementById('clientsBody');
+  body.innerHTML = clients.map(c=>`
+    <tr>
+      <td class="cell-main">${c.name}</td>
+      <td class="mono">${c.bin}</td>
+      <td>${c.contact}</td>
+      <td><div>${c.phone}</div><div class="cell-sub">${c.email}</div></td>
+      <td><span class="pill pill-active">${c.active} активных</span></td>
+    </tr>`).join('');
+}
+
+function renderDocs(){
+  const body = document.getElementById('docsBody');
+  const statusMap = {ok:['pill-active','Проверен'], review:['pill-review','На проверке'], warn:['pill-review','Требует замены']};
+  body.innerHTML = docs.map(d=>{
+    const [cls,label] = statusMap[d.status];
+    return `<tr>
+      <td><div class="doc-type"><div class="doc-ico">${d.icon}</div><span class="cell-main">${d.type}</span></div></td>
+      <td class="mono">${d.app}</td>
+      <td>${d.citizen}</td>
+      <td class="mono">${fmtDate(d.date)}</td>
+      <td><span class="pill ${cls}">${label}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+// Nav switching
+document.querySelectorAll('.nav-item').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+    document.getElementById('view-'+btn.dataset.view).classList.add('active');
+  });
+});
+
+renderKanban();
+renderCitizens();
+renderClients();
+renderDocs();
+</script>
+</body>
+</html>
