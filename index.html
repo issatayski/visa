@@ -49,16 +49,15 @@
     border-right:1px solid var(--line);
     width:248px;
     flex-shrink:0;
-    overflow:hidden;
     transition:width .18s ease, padding .18s ease;
   }
   .sidebar.collapsed{width:72px; padding:20px 10px;}
 
   .sidebar-toggle{
-    position:absolute; top:26px; right:-12px; width:24px; height:24px; border-radius:50%;
-    background:#fff; border:1px solid var(--line); box-shadow:0 1px 3px rgba(0,0,0,.1);
+    position:absolute; top:26px; right:-13px; width:26px; height:26px; border-radius:50%;
+    background:#fff; border:1px solid var(--line); box-shadow:0 2px 5px rgba(22,33,62,.12);
     display:flex; align-items:center; justify-content:center; cursor:pointer;
-    color:var(--muted); z-index:5; font-size:13px; line-height:1; padding:0;
+    color:var(--muted); z-index:20; font-size:13px; line-height:1; padding:0;
     transition:color .15s, border-color .15s;
   }
   .sidebar-toggle:hover{color:var(--navy); border-color:var(--navy);}
