@@ -252,12 +252,21 @@
   ::-webkit-scrollbar-thumb{background:#C9C7BB; border-radius:20px;}
 
   @media (max-width:820px){
-    .app{grid-template-columns:1fr;}
-    .sidebar{position:relative; height:auto; flex-direction:row; align-items:center; overflow-x:auto;}
-    .brand{padding:6px 14px 6px 0;}
-    .nav{flex-direction:row;}
+    .app{grid-template-columns:72px 1fr;}
+    .sidebar{padding:16px 10px; align-items:center;}
+    .brand{padding:6px 0 20px 0; justify-content:center;}
+    .brand-text{display:none;}
+    .nav{width:100%;}
+    .nav-item{justify-content:center; padding:12px 8px;}
+    .nav-label{display:none;}
+    .nav-count{display:none;}
     .sidebar-footer{display:none;}
-    .main{padding:20px;}
+    .main{padding:20px 16px;}
+  }
+  @media (max-width:520px){
+    .app{grid-template-columns:60px 1fr;}
+    .sidebar{padding:12px 6px;}
+    .nav-item svg{width:19px; height:19px;}
   }
 </style>
 </head>
@@ -274,25 +283,25 @@
       </div>
     </div>
     <nav class="nav">
-      <button class="nav-item active" data-view="kanban">
+      <button class="nav-item active" data-view="kanban" title="Воронка заявок">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="7" height="16" rx="1"/><rect x="14" y="4" width="7" height="9" rx="1"/></svg>
-        Воронка заявок <span class="nav-count" id="navCountKanban">—</span>
+        <span class="nav-label">Воронка заявок</span> <span class="nav-count" id="navCountKanban">—</span>
       </button>
-      <button class="nav-item" data-view="anketa">
+      <button class="nav-item" data-view="anketa" title="Анкета">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 2h6l1 3H8l1-3z"/><rect x="5" y="4" width="14" height="18" rx="2"/><path d="M9 11h6M9 15h6M9 19h3"/></svg>
-        Анкета
+        <span class="nav-label">Анкета</span>
       </button>
-      <button class="nav-item" data-view="citizens">
+      <button class="nav-item" data-view="citizens" title="Иностранные граждане">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.5-7 8-7s8 3 8 7"/></svg>
-        Иностранные граждане <span class="nav-count" id="navCountCitizens">—</span>
+        <span class="nav-label">Иностранные граждане</span> <span class="nav-count" id="navCountCitizens">—</span>
       </button>
-      <button class="nav-item" data-view="clients">
+      <button class="nav-item" data-view="clients" title="Клиенты">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21V7l7-4 7 4v14"/><path d="M10 21v-6h4v6"/></svg>
-        Клиенты <span class="nav-count" id="navCountClients">—</span>
+        <span class="nav-label">Клиенты</span> <span class="nav-count" id="navCountClients">—</span>
       </button>
-      <button class="nav-item" data-view="docs">
+      <button class="nav-item" data-view="docs" title="Документы">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
-        Документы <span class="nav-count" id="navCountDocs">—</span>
+        <span class="nav-label">Документы</span> <span class="nav-count" id="navCountDocs">—</span>
       </button>
     </nav>
     <div class="sidebar-footer mono">
