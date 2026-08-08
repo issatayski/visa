@@ -287,6 +287,43 @@
     font-size:9.5px; font-weight:600; padding:2px 7px; border-radius:5px; margin-top:6px;
   }
 
+  /* ---------- Справочник документов ---------- */
+  .ref-filters{display:flex; gap:12px; margin-bottom:20px; flex-wrap:wrap;}
+  .ref-filters select{
+    font-family:'IBM Plex Sans', sans-serif; font-size:13.5px; padding:9px 12px;
+    border:1px solid var(--line); border-radius:8px; background:#fff; color:var(--ink); min-width:220px;
+  }
+  .ref-grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(320px,1fr)); gap:16px;}
+  .ref-card{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:18px 20px;}
+  .ref-card-head{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:4px;}
+  .ref-card h3{font-size:15px; margin:0; font-weight:700;}
+  .ref-tag{font-family:'IBM Plex Mono', monospace; font-size:10px; font-weight:700; padding:2px 8px; border-radius:5px; background:var(--primary-bg); color:var(--navy); flex-shrink:0;}
+  .ref-card .cat{font-size:11.5px; color:var(--muted); margin:0 0 14px 0;}
+  .ref-list{list-style:none; margin:0; padding:0; counter-reset:refitem;}
+  .ref-list li{
+    counter-increment:refitem; font-size:13px; padding:6px 0 6px 26px; position:relative;
+    border-bottom:1px solid #F2F1EA;
+  }
+  .ref-list li:last-child{border-bottom:none;}
+  .ref-list li::before{
+    content:counter(refitem); position:absolute; left:0; top:6px;
+    width:18px; height:18px; border-radius:5px; background:var(--paper); color:var(--muted);
+    font-family:'IBM Plex Mono', monospace; font-size:10px; font-weight:700;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .ref-empty{font-size:12.5px; color:var(--muted); font-style:italic; padding:8px 0;}
+  .ref-note{
+    margin-top:12px; padding:10px 12px; background:var(--primary-bg); color:var(--navy);
+    border-radius:8px; font-size:12px; line-height:1.5;
+  }
+  .ref-meta{display:flex; gap:16px; flex-wrap:wrap; margin-top:12px; padding-top:12px; border-top:1px solid var(--line);}
+  .ref-meta-item{font-size:11.5px;}
+  .ref-meta-item .l{color:var(--muted); display:block; margin-bottom:2px;}
+  .ref-meta-item .v{font-family:'IBM Plex Mono', monospace; font-weight:600;}
+  .ref-costs{margin-top:12px; padding-top:12px; border-top:1px solid var(--line);}
+  .ref-costs .row{display:flex; justify-content:space-between; font-size:12px; padding:3px 0;}
+  .ref-costs .row .amt{font-family:'IBM Plex Mono', monospace; font-weight:600; color:var(--ink);}
+
   ::-webkit-scrollbar{height:8px; width:8px;}
   ::-webkit-scrollbar-thumb{background:#C9C7BB; border-radius:20px;}
 
@@ -338,6 +375,10 @@
       <button class="nav-item" data-view="docs" title="Документы">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
         <span class="nav-label">Документы</span> <span class="nav-count" id="navCountDocs">—</span>
+      </button>
+      <button class="nav-item" data-view="reference" title="Справочник документов">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        <span class="nav-label">Справочник документов</span>
       </button>
     </nav>
     <div class="sidebar-footer mono">
@@ -513,6 +554,21 @@
       </div>
     </section>
 
+    <!-- REFERENCE VIEW -->
+    <section class="view" id="view-reference">
+      <div class="topbar">
+        <div>
+          <h1>Справочник документов</h1>
+          <p class="desc">Перечни документов по типам виз и разрешений. Выберите категорию и тип, чтобы увидеть чек-лист</p>
+        </div>
+      </div>
+      <div class="ref-filters">
+        <select id="refCategory"></select>
+        <select id="refType"></select>
+      </div>
+      <div class="ref-grid" id="refGrid"></div>
+    </section>
+
   </main>
 </div>
 
@@ -556,6 +612,81 @@ const docs = [
   {type:"Анкета-приглашение", icon:"📄", app:"#VZ-1035", citizen:"Ахмет Йылмаз", date:"2026-07-21", status:"ok"},
   {type:"Паспорт (скан)", icon:"📘", app:"#VZ-1028", citizen:"Ли Вэй", date:"2026-07-10", status:"ok"},
   {type:"Трудовой договор", icon:"📑", app:"#VZ-1028", citizen:"Ли Вэй", date:"2026-07-11", status:"ok"}
+];
+
+// Справочник документов — извлечено из "Перечень документов.xlsx" (листы С3, С5, В2, В3, А5, ИРС, РВП, ТОО)
+const docReference = [
+  // ---- Визы ----
+  {category:"Визы", code:"С3", variant:"на основании ИРС", documents:[
+    "Ходатайство","Визовая анкета №15","Справка разрешения (ИРС)","Свидетельство о гос. регистрации",
+    "Справка с сайта Enbek.kz","Квитанция об оплате госпошлины 30 МРП","Справка дакто","Доверенность"
+  ]},
+  {category:"Визы", code:"С3", variant:"директор / зам. директора", documents:[
+    "Ходатайство","Визовая анкета №15","Приказ (на директора/заместителя директора)","Решение (если директор)",
+    "Трудовой договор (если зам. директора)","Свидетельство о гос. регистрации","Справка НАО",
+    "Справка с сайта Enbek.kz","Квитанция об оплате госпошлины 30 МРП","Справка дакто","Доверенность"
+  ]},
+  {category:"Визы", code:"С5", variant:"90 дней, однократная (приглашение)", documents:[
+    "Ходатайство (2 шт)","Приглашение (3 шт)","Паспорт (копия)","Свидетельство о гос. регистрации",
+    "Квитанция об оплате госпошлины 0,5 МРП","Доверенность"
+  ], note:"Для анкеты уточнить: от какой ТОО приглашаем"},
+  {category:"Визы", code:"С5", variant:"1/2 года, многократная", documents:[
+    "Ходатайство","Визовая анкета №15","Письмо в УПП","Свидетельство о гос. регистрации",
+    "Квитанция об оплате госпошлины 30 МРП","Справка дакто","Доверенность"
+  ]},
+  {category:"Визы", code:"В2", variant:"90/180 дней, многократная", documents:[
+    "Ходатайство (2 шт)","Приглашение (3 шт)","Паспорт (копия)","Свидетельство о гос. регистрации",
+    "Копия договора / контракта","Квитанция об оплате госпошлины 0,5 МРП","Доверенность"
+  ], costs:{"Наша услуга":"150 000 ₸","Госпошлина (клиент)":"0,5 МРП","Адм. расход":"7 000 ₸","Сотрудник (Азиза)":"5 000 ₸"}},
+  {category:"Визы", code:"В2", variant:"30/90 дней, однократная", documents:[
+    "Ходатайство (2 шт)","Приглашение (3 шт)","Паспорт (копия)","Свидетельство о гос. регистрации",
+    "Квитанция об оплате госпошлины 0,5 МРП","Доверенность"
+  ], costs:{"Наша услуга":"150 000 ₸","Госпошлина (клиент)":"0,5 МРП","Адм. расход":"7 000 ₸","Сотрудник (Азиза)":"5 000 ₸"}},
+  {category:"Визы", code:"В2", variant:"30/90 дней, однократная (электронная)", documents:[
+    "Ходатайство (2 шт)","Приглашение (3 шт)","Паспорт (копия)","Свидетельство о гос. регистрации",
+    "Квитанция об оплате госпошлины 0,5 МРП","Доверенность","Оплата консульского сбора через ВМП (80 $)"
+  ], costs:{"Наша услуга":"150 000 ₸","Госпошлина (клиент)":"0,5 МРП","Адм. расход":"7 000 ₸","Сотрудник (Азиза)":"5 000 ₸","Пошлина за эл. визу":"42 000 ₸"}},
+  {category:"Визы", code:"В3", variant:"30 дней, однократная", documents:[
+    "Ходатайство (2 шт)","Визовая анкета №15","Свидетельство о гос. регистрации","Оригинал паспорта",
+    "Квитанция об оплате госпошлины 7 МРП","Справка дакто","Доверенность"
+  ], costs:{"Наша услуга":"120 000 ₸","Госпошлина (клиент)":"7 МРП","Адм. расход":"7 000 ₸","Сотрудник (Азиза)":"5 000 ₸","За отпечатки":"2 000 ₸"}, timeline:"5–10 рабочих дней"},
+  {category:"Визы", code:"А5", variant:"3 года, многократная (инвесторская)", documents:[
+    "Ходатайство (2 шт)","Визовая анкета №15","Свидетельство о гос. регистрации","Оригинал паспорта",
+    "Ходатайство с МИД","Квитанция об оплате госпошлины 30 МРП","Справка дакто","Доверенность"
+  ], costs:{"Наша услуга":"400 000 ₸","Госпошлина (клиент)":"30 МРП","За отпечатки":"3 000 ₸"}},
+
+  // ---- Разрешения и процедуры ----
+  {category:"Разрешения и процедуры", code:"ИРС", variant:"разрешение на трудоустройство", documents:[
+    "Вакансия на сайте Enbek.kz","Диплом (с апостилем)","Перевод паспорта","ЭЦП ключи","Уведомление об оплате"
+  ]},
+  {category:"Разрешения и процедуры", code:"РВП", variant:"бизнес-иммигрант, на 3 месяца", documents:[
+    "Уведомление о прибытии","Паспорт","Перевод паспорта","ИИН",
+    "Согласие собственника жилья на проживание и постановку на учёт","Медицинская страховка (на 3 мес.)",
+    "Справка об отсутствии судимости (с печатью/подписью)","Справка об отсутствии запрета на предпринимательскую деятельность",
+    "Дактилоскопия","Мед. справка (форма 028/у)"
+  ], note:"Закон РК «О миграции населения» (ст. 40) обязывает зарегистрировать ТОО в течение 2 месяцев (60 дней) с момента въезда"},
+  {category:"Разрешения и процедуры", code:"РВП", variant:"бизнес-иммигрант, на 1 год", documents:[
+    "Ответ УПИР","Ходатайство в УМС","Паспорт","ИИН","Перевод паспорта",
+    "Согласие собственника жилья на проживание и постановку на учёт (удост. копия)",
+    "Справка об отсутствии судимости (с подписью)","Медицинская страховка (на 1 год)","Дактилоскопия",
+    "Мед. справка (форма 028/у)","Справка о гос. регистрации ТОО","Устав и Решение о назначении директора"
+  ]},
+  {category:"Разрешения и процедуры", code:"ТОО", variant:"открытие (физлицом)", documents:[
+    "Заявление","ИИН","Перевод паспорта с копией визы С5 (нотариально заверенный)","Оригинал паспорта","Согласие на юр. адрес"
+  ]},
+  {category:"Разрешения и процедуры", code:"ТОО", variant:"открытие (юрлицом)", documents:[], note:"Раздел не заполнен в исходном файле — уточнить у клиента"},
+  {category:"Разрешения и процедуры", code:"УПП", variant:"письмо в УПП (п. 3.1)", documents:[
+    "Заявление","Справка проекта","Презентация проекта","Копия паспорта и визы С5","Свидетельство о гос. регистрации","Доверенность"
+  ]},
+  {category:"Разрешения и процедуры", code:"МИД", variant:"ходатайство для инвесторской визы", documents:[
+    "Устав (нотариально заверенная копия)","Приказ (скан, руководящая должность)","Перевод паспорта (нотариально заверенный)",
+    "Письмо в КазахИнвест / инвестиционный контракт","Документы на оборудование (договоры, инвойсы, ГТД, счета-фактуры, квитанции)",
+    "ЭЦП юр. лица","Сумма инвестиции"
+  ]},
+  {category:"Разрешения и процедуры", code:"КазахИнвест", variant:"получение письма", documents:[
+    "Перевод паспорта (нотариально заверенный)","Приказ (скан, руководящая должность)","Информация о проекте",
+    "Сумма инвестиции","Справка / информация об инвесторе"
+  ]}
 ];
 
 const columns = [
@@ -969,6 +1100,58 @@ sidebarToggleBtn.addEventListener('click', ()=>{
 });
 setSidebarCollapsed(window.innerWidth < 900);
 
+// ---------- Справочник документов ----------
+function populateRefFilters(){
+  const catSel = document.getElementById('refCategory');
+  const categories = [...new Set(docReference.map(r=>r.category))];
+  catSel.innerHTML = '<option value="__all__">Все категории</option>' +
+    categories.map(c=>`<option value="${c}">${c}</option>`).join('');
+  catSel.addEventListener('change', ()=>{ populateRefTypeOptions(); renderReference(); });
+
+  document.getElementById('refType').addEventListener('change', renderReference);
+  populateRefTypeOptions();
+}
+
+function populateRefTypeOptions(){
+  const cat = document.getElementById('refCategory').value;
+  const typeSel = document.getElementById('refType');
+  const items = cat === '__all__' ? docReference : docReference.filter(r=>r.category===cat);
+  typeSel.innerHTML = '<option value="__all__">Все типы</option>' +
+    items.map((r,i)=>`<option value="${r.code}|${r.variant}">${r.code} — ${r.variant}</option>`).join('');
+}
+
+function renderReference(){
+  const cat = document.getElementById('refCategory').value;
+  const typeVal = document.getElementById('refType').value;
+  let items = cat === '__all__' ? docReference : docReference.filter(r=>r.category===cat);
+  if(typeVal !== '__all__'){
+    items = items.filter(r=> (r.code+'|'+r.variant) === typeVal);
+  }
+
+  const grid = document.getElementById('refGrid');
+  if(items.length === 0){
+    grid.innerHTML = '<div class="ref-empty">Ничего не найдено по выбранным фильтрам</div>';
+    return;
+  }
+
+  grid.innerHTML = items.map(r=>`
+    <div class="ref-card">
+      <div class="ref-card-head">
+        <h3>${r.variant}</h3>
+        <span class="ref-tag">${r.code}</span>
+      </div>
+      <p class="cat">${r.category}</p>
+      ${r.documents.length
+        ? `<ul class="ref-list">${r.documents.map(d=>`<li>${d}</li>`).join('')}</ul>`
+        : `<div class="ref-empty">Список документов не заполнен</div>`
+      }
+      ${r.timeline ? `<div class="ref-meta"><div class="ref-meta-item"><span class="l">Срок получения</span><span class="v">${r.timeline}</span></div></div>` : ''}
+      ${r.costs ? `<div class="ref-costs">${Object.entries(r.costs).map(([k,v])=>`<div class="row"><span>${k}</span><span class="amt">${v}</span></div>`).join('')}</div>` : ''}
+      ${r.note ? `<div class="ref-note">${r.note}</div>` : ''}
+    </div>
+  `).join('');
+}
+
 // Nav switching
 document.querySelectorAll('.nav-item').forEach(btn=>{
   btn.addEventListener('click', ()=>{
@@ -980,6 +1163,8 @@ document.querySelectorAll('.nav-item').forEach(btn=>{
 });
 
 populateAnketaSelects();
+populateRefFilters();
+renderReference();
 renderKanban();
 renderCitizens();
 renderClients();
