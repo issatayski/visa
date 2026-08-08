@@ -248,6 +248,20 @@
   }
   .success-banner.active{display:flex;}
 
+  /* ---------- Курьер ---------- */
+  .pill-wait{background:#FFF3E0; color:#9A6A11;}
+  .pill-ready{background:var(--primary-bg); color:var(--navy);}
+  .pill-done{background:#EEE; color:#666;}
+  .courier-name{display:flex; align-items:center; gap:8px;}
+  .courier-ico{width:26px; height:26px; border-radius:50%; background:var(--primary-bg); color:var(--navy); display:flex; align-items:center; justify-content:center; font-size:12px;}
+  .days-left{font-family:'IBM Plex Mono', monospace; font-size:11px; color:var(--muted);}
+  .days-left.due{color:var(--stamp-red); font-weight:600;}
+
+  .courier-chip{
+    display:inline-flex; align-items:center; gap:4px; font-family:'IBM Plex Mono', monospace;
+    font-size:9.5px; font-weight:600; padding:2px 7px; border-radius:5px; margin-top:6px;
+  }
+
   ::-webkit-scrollbar{height:8px; width:8px;}
   ::-webkit-scrollbar-thumb{background:#C9C7BB; border-radius:20px;}
 
@@ -290,6 +304,10 @@
       <button class="nav-item" data-view="anketa" title="Анкета">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 2h6l1 3H8l1-3z"/><rect x="5" y="4" width="14" height="18" rx="2"/><path d="M9 11h6M9 15h6M9 19h3"/></svg>
         <span class="nav-label">Анкета</span>
+      </button>
+      <button class="nav-item" data-view="courier" title="Курьер">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="7" width="14" height="10" rx="1"/><path d="M15 10h4l3 3v4h-7z"/><circle cx="6" cy="19" r="2"/><circle cx="17" cy="19" r="2"/></svg>
+        <span class="nav-label">Курьер</span> <span class="nav-count" id="navCountCourier">—</span>
       </button>
       <button class="nav-item" data-view="citizens" title="Иностранные граждане">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.5-7 8-7s8 3 8 7"/></svg>
@@ -439,6 +457,25 @@
       </div>
     </section>
 
+    <!-- COURIER VIEW -->
+    <section class="view" id="view-courier">
+      <div class="topbar">
+        <div>
+          <h1>Курьер</h1>
+          <p class="desc">Курьер забирает документы у клиента, подаёт их в миграционное ведомство и через 5 рабочих дней забирает готовое решение</p>
+        </div>
+        <button class="btn-primary">+ Назначить курьера</button>
+      </div>
+      <div class="panel">
+        <table>
+          <thead><tr>
+            <th>Заявка</th><th>Курьер</th><th>Забор документов</th><th>Подача в ведомство</th><th>Готовность (+5 раб. дн.)</th><th>Статус</th>
+          </tr></thead>
+          <tbody id="courierBody"></tbody>
+        </table>
+      </div>
+    </section>
+
     <!-- DOCS VIEW -->
     <section class="view" id="view-docs">
       <div class="topbar">
@@ -545,6 +582,17 @@ const applications = [
   {id:"VZ-1001", citizen:citizens[4], stage:"done", visaType:"Рабочая, однократная", manager:"МЖ", client:'АО «Каспий Энергоресурсы»', entryCity:"Шымкент", track:"ВМП-86502К"}
 ];
 
+// Курьерские задачи: забор документов у клиента → подача в миграционное ведомство → выдача через 5 рабочих дней
+const courierTasks = [
+  {appId:"VZ-1036", courier:"Ерлан Сагимбаев", pickupAddress:"г. Шымкент, офис клиента — АО «Каспий Энергоресурсы»", pickupDate:"2026-08-08", submitDate:null, collected:false},
+  {appId:"VZ-1028", courier:"Ерлан Сагимбаев", pickupAddress:"г. Шымкент, офис клиента — ТОО «TechnoLogistics»", pickupDate:"2026-08-03", submitDate:"2026-08-03", collected:false},
+  {appId:"VZ-1030", courier:"Гульжан Ахметова", pickupAddress:"г. Шымкент, офис клиента — ТОО «AlmatyBuild Group»", pickupDate:"2026-08-05", submitDate:"2026-08-05", collected:false},
+  {appId:"VZ-1019", courier:"Ерлан Сагимбаев", pickupAddress:"г. Шымкент, офис клиента — ТОО «GreenField Agro»", pickupDate:"2026-07-29", submitDate:"2026-07-29", collected:false},
+  {appId:"VZ-1021", courier:"Гульжан Ахметова", pickupAddress:"г. Шымкент, офис клиента — ИП «Нурланов Тимур»", pickupDate:"2026-07-30", submitDate:"2026-07-30", collected:false},
+  {appId:"VZ-1022", courier:"Ерлан Сагимбаев", pickupAddress:"г. Шымкент, офис клиента — ТОО «TechnoLogistics»", pickupDate:"2026-07-31", submitDate:"2026-07-31", collected:false},
+  {appId:"VZ-0998", courier:"Гульжан Ахметова", pickupAddress:"г. Шымкент, офис клиента — ТОО «СтройИнвест Казахстан»", pickupDate:"2026-07-10", submitDate:"2026-07-10", collected:true, collectedDate:"2026-07-17"}
+];
+
 function monthsUntil(dateStr){
   if(!dateStr) return Infinity;
   const now = new Date("2026-08-07");
@@ -556,6 +604,38 @@ function fmtDate(s){
   if(!s) return "—";
   const [y,m,d] = s.split("-");
   return `${d}.${m}.${y}`;
+}
+
+const TODAY = "2026-08-07";
+
+// Прибавляет N рабочих дней к дате (пропускает субботу/воскресенье)
+function addBusinessDays(dateStr, days){
+  let d = new Date(dateStr+"T00:00:00");
+  let added = 0;
+  while(added < days){
+    d.setDate(d.getDate()+1);
+    const day = d.getDay();
+    if(day !== 0 && day !== 6) added++;
+  }
+  return d.toISOString().slice(0,10);
+}
+
+function daysBetween(a,b){
+  return Math.round((new Date(b+"T00:00:00") - new Date(a+"T00:00:00")) / (1000*60*60*24));
+}
+
+function courierStatus(task){
+  if(task.collected){
+    return {label:"Выдано заказчику", cls:"pill-done", readyDate: addBusinessDays(task.submitDate,5)};
+  }
+  if(!task.submitDate){
+    return {label:"Забор документов", cls:"pill-wait", readyDate:null};
+  }
+  const readyDate = addBusinessDays(task.submitDate, 5);
+  if(TODAY >= readyDate){
+    return {label:"Готово к выдаче", cls:"pill-ready", readyDate};
+  }
+  return {label:"В ведомстве (ожидание)", cls:"pill-wait", readyDate};
 }
 
 function renderKanban(){
@@ -647,6 +727,14 @@ function openModal(a){
     <div class="kv"><span class="k">Город консульства</span><span class="v">${a.entryCity}</span></div>
     <div class="kv"><span class="k">Ответственный</span><span class="v">${a.manager ? managers[a.manager] : '—'}</span></div>
     ${a.track ? `<div class="kv"><span class="k">Трек-номер ВМП</span><span class="v mono">${a.track}</span></div>` : ''}
+    ${(()=>{
+      const t = courierTasks.find(c=>c.appId===a.id);
+      if(!t) return '';
+      const st = courierStatus(t);
+      return `<div class="kv"><span class="k">Курьер</span><span class="v">${t.courier}</span></div>
+              <div class="kv"><span class="k">Готовность (+5 раб. дн.)</span><span class="v mono">${st.readyDate ? fmtDate(st.readyDate) : '—'}</span></div>
+              <div class="kv"><span class="k">Статус курьера</span><span class="v"><span class="pill ${st.cls}">${st.label}</span></span></div>`;
+    })()}
     ${warn
       ? `<div class="stamp-big" style="background:var(--stamp-red-bg); color:var(--stamp-red);">⛔ ВАЛИДАТОР: паспорт истекает менее чем через 6 мес — переход заблокирован</div>`
       : `<div class="stamp-big" style="background:var(--success-bg); color:var(--success);">✔ Срок действия паспорта в норме</div>`
@@ -700,11 +788,38 @@ function renderDocs(){
   }).join('');
 }
 
+function renderCourier(){
+  const body = document.getElementById('courierBody');
+  body.innerHTML = courierTasks.map(t=>{
+    const app = applications.find(a=>a.id===t.appId);
+    const st = courierStatus(t);
+    let daysHtml = '';
+    if(st.readyDate && st.label==="В ведомстве (ожидание)"){
+      const left = daysBetween(TODAY, st.readyDate);
+      daysHtml = `<div class="days-left">осталось ~${left} дн.</div>`;
+    } else if(st.label==="Готово к выдаче"){
+      daysHtml = `<div class="days-left due">забрать сегодня</div>`;
+    }
+    return `<tr>
+      <td>
+        <div class="cell-main">${app ? app.citizen.flag+' '+app.citizen.name : t.appId}</div>
+        <div class="cell-sub mono">#${t.appId}${app && app.track ? ' · '+app.track : ''}</div>
+      </td>
+      <td><div class="courier-name"><span class="courier-ico">🛵</span>${t.courier}</div></td>
+      <td><span class="mono">${fmtDate(t.pickupDate)}</span><div class="cell-sub">${t.pickupAddress}</div></td>
+      <td><span class="mono">${fmtDate(t.submitDate)}</span></td>
+      <td><span class="mono">${st.readyDate ? fmtDate(st.readyDate) : '—'}</span>${daysHtml}</td>
+      <td><span class="pill ${st.cls}">${st.label}</span>${t.collected ? `<div class="cell-sub">выдано ${fmtDate(t.collectedDate)}</div>` : ''}</td>
+    </tr>`;
+  }).join('');
+}
+
 function updateNavCounts(){
   document.getElementById('navCountKanban').textContent = applications.length;
   document.getElementById('navCountCitizens').textContent = citizens.length;
   document.getElementById('navCountClients').textContent = clients.length;
   document.getElementById('navCountDocs').textContent = docs.length;
+  document.getElementById('navCountCourier').textContent = courierTasks.filter(t=>!t.collected).length;
 }
 
 // ---------- Анкета (форма добавления) ----------
@@ -839,6 +954,7 @@ renderKanban();
 renderCitizens();
 renderClients();
 renderDocs();
+renderCourier();
 updateNavCounts();
 </script>
 </body>
