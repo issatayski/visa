@@ -3,24 +3,27 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>STAMP CRM — Визовое сопровождение</title>
+<title>Visa — Визовое сопровождение</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
-    --navy:#16213E;
-    --navy-light:#223159;
-    --navy-lighter:#2E3E6B;
-    --paper:#EDEEE7;
+    --navy:#1868DB;
+    --navy-light:#125BC0;
+    --navy-lighter:#2D6BC4;
+    --primary-bg:#EAF2FE;
+    --accent:#FF9A3D;
+    --accent-dark:#F0821F;
+    --paper:#F4F6F9;
     --card:#FFFFFF;
-    --stamp-red:#A6303C;
+    --stamp-red:#C0392B;
     --stamp-red-bg:#FBEAEA;
     --gold:#B8933D;
-    --success:#3A7A5D;
-    --success-bg:#E7F1EB;
-    --ink:#1B1B1E;
-    --muted:#6B7280;
-    --line:#DFDDD3;
+    --success:#2FA36A;
+    --success-bg:#E7F6EE;
+    --ink:#252B37;
+    --muted:#8792A2;
+    --line:#E7E9EE;
     --radius:10px;
   }
   *{box-sizing:border-box;}
@@ -38,45 +41,47 @@
 
   /* Sidebar */
   .sidebar{
-    background:var(--navy);
-    color:#EDEEF5;
-    padding:22px 16px;
+    background:#FFFFFF;
+    color:var(--ink);
+    padding:20px 14px;
     display:flex; flex-direction:column;
     position:sticky; top:0; height:100vh;
+    border-right:1px solid var(--line);
   }
-  .brand{display:flex; align-items:center; gap:10px; padding:6px 8px 24px 8px;}
+  .brand{display:flex; align-items:center; gap:10px; padding:6px 8px 22px 8px;}
   .stamp-mark{
-    width:34px; height:34px; border-radius:50%;
-    border:2px solid var(--gold);
+    width:32px; height:32px; border-radius:8px;
+    background:var(--navy);
     display:flex; align-items:center; justify-content:center;
-    color:var(--gold); font-weight:700; font-size:13px;
+    color:#fff; font-weight:700; font-size:14px;
     font-family:'IBM Plex Mono', monospace;
-    transform:rotate(-8deg);
     flex-shrink:0;
   }
   .brand-text{line-height:1.1;}
-  .brand-text .name{font-weight:700; font-size:16px; letter-spacing:0.02em;}
-  .brand-text .sub{font-size:11px; color:#9AA3C4; margin-top:2px;}
+  .brand-text .name{font-weight:700; font-size:17px; letter-spacing:-.01em; color:var(--ink);}
+  .brand-text .sub{font-size:10.5px; color:var(--muted); margin-top:2px;}
 
   .nav{display:flex; flex-direction:column; gap:2px; margin-top:8px;}
   .nav-item{
     display:flex; align-items:center; gap:10px;
     padding:10px 12px; border-radius:8px;
-    color:#C7CCE3; font-size:14px; font-weight:500;
+    color:#5B6472; font-size:13.5px; font-weight:500;
     cursor:pointer; border:none; background:none; text-align:left; width:100%;
     transition:background .15s, color .15s;
   }
-  .nav-item svg{width:17px; height:17px; opacity:.85; flex-shrink:0;}
-  .nav-item:hover{background:var(--navy-light); color:#fff;}
-  .nav-item.active{background:var(--navy-lighter); color:#fff;}
+  .nav-item svg{width:17px; height:17px; opacity:.8; flex-shrink:0;}
+  .nav-item:hover{background:#F3F5F8; color:var(--ink);}
+  .nav-item.active{background:var(--primary-bg); color:var(--navy); font-weight:600;}
+  .nav-item.active svg{opacity:1;}
   .nav-count{
-    margin-left:auto; font-family:'IBM Plex Mono', monospace; font-size:11px;
-    color:#8B93B8; background:rgba(255,255,255,.06); padding:1px 7px; border-radius:20px;
+    margin-left:auto; font-family:'IBM Plex Mono', monospace; font-size:10.5px;
+    color:var(--muted); background:#F0F1F4; padding:1px 7px; border-radius:20px;
   }
+  .nav-item.active .nav-count{background:#DCEBFD; color:var(--navy);}
 
   .sidebar-footer{
-    margin-top:auto; padding:14px 10px; border-top:1px solid var(--navy-light);
-    font-size:11px; color:#7C84AC; line-height:1.5;
+    margin-top:auto; padding:14px 10px; border-top:1px solid var(--line);
+    font-size:10.5px; color:var(--muted); line-height:1.5;
   }
 
   /* Main */
@@ -85,12 +90,12 @@
   .topbar h1{font-size:22px; margin:0 0 4px 0; font-weight:700; letter-spacing:-.01em;}
   .topbar .desc{color:var(--muted); font-size:13.5px; margin:0;}
   .btn-primary{
-    background:var(--navy); color:#fff; border:none; padding:10px 18px;
+    background:var(--accent); color:#fff; border:none; padding:10px 18px;
     border-radius:8px; font-weight:600; font-size:13.5px; cursor:pointer;
     display:flex; align-items:center; gap:8px;
     transition:background .15s;
   }
-  .btn-primary:hover{background:var(--navy-light);}
+  .btn-primary:hover{background:var(--accent-dark);}
 
   .view{display:none;}
   .view.active{display:block;}
@@ -188,6 +193,61 @@
     letter-spacing:.03em;
   }
 
+  /* Draft cards ("начато сегодня/вчера") */
+  .card.draft{border-style:dashed; border-color:#CFC9A8; background:#FDFCF7;}
+  .badge-draft{background:#FBF2DD; color:var(--gold);}
+  .draft-note{font-size:11.5px; color:var(--muted); font-style:italic; margin-top:8px;}
+
+  /* ---------- Анкета (form) ---------- */
+  .form-wrap{display:flex; gap:22px; align-items:flex-start; flex-wrap:wrap;}
+  .form-panel{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:24px; flex:1 1 560px; max-width:640px;}
+  .form-section{margin-bottom:22px;}
+  .form-section:last-child{margin-bottom:0;}
+  .form-section h3{
+    font-size:11px; text-transform:uppercase; letter-spacing:.05em; color:var(--navy-lighter);
+    margin:0 0 14px 0; padding-bottom:8px; border-bottom:1px solid var(--line); font-weight:700;
+  }
+  .form-grid{display:grid; grid-template-columns:1fr 1fr; gap:14px 16px;}
+  .field{display:flex; flex-direction:column; gap:6px;}
+  .field.full{grid-column:1 / -1;}
+  .field label{font-size:12px; font-weight:600; color:var(--ink);}
+  .field .hint{font-size:10.5px; color:var(--muted); font-weight:400;}
+  .field input, .field select{
+    font-family:'IBM Plex Sans', sans-serif; font-size:13.5px; padding:9px 11px;
+    border:1px solid var(--line); border-radius:7px; background:#fff; color:var(--ink);
+    width:100%;
+  }
+  .field input:focus, .field select:focus{outline:none; border-color:var(--navy-lighter); box-shadow:0 0 0 3px rgba(46,62,107,.12);}
+  .field input.warn-input{border-color:var(--stamp-red); background:var(--stamp-red-bg);}
+  .inline-warn{font-size:11.5px; color:var(--stamp-red); font-weight:600; margin-top:2px;}
+  .inline-ok{font-size:11.5px; color:var(--success); font-weight:600; margin-top:2px;}
+
+  .form-actions{display:flex; align-items:center; gap:12px; margin-top:24px; padding-top:18px; border-top:1px solid var(--line);}
+  .btn-secondary{
+    background:none; border:1px solid var(--line); color:var(--ink); padding:10px 16px;
+    border-radius:8px; font-weight:600; font-size:13.5px; cursor:pointer;
+  }
+  .btn-secondary:hover{background:#F5F4EF;}
+  .form-error{font-size:12.5px; color:var(--stamp-red); font-weight:600;}
+
+  .side-note{
+    flex:0 0 260px; background:#fff; border:1px solid var(--line); border-radius:var(--radius);
+    padding:20px; font-size:12.5px; color:var(--muted); line-height:1.6;
+  }
+  .side-note h4{margin:0 0 10px 0; font-size:12.5px; color:var(--ink); text-transform:uppercase; letter-spacing:.04em;}
+  .side-note .stamp-mini{
+    display:inline-flex; align-items:center; gap:6px; margin-top:12px; padding:6px 10px;
+    border-radius:7px; font-family:'IBM Plex Mono', monospace; font-size:11px; font-weight:700;
+    background:var(--success-bg); color:var(--success);
+  }
+
+  .success-banner{
+    display:none; align-items:center; gap:10px; background:var(--success-bg); color:var(--success);
+    border:1px solid #BFDCC9; border-radius:9px; padding:12px 16px; font-size:13px; font-weight:600;
+    margin-bottom:18px;
+  }
+  .success-banner.active{display:flex;}
+
   ::-webkit-scrollbar{height:8px; width:8px;}
   ::-webkit-scrollbar-thumb{background:#C9C7BB; border-radius:20px;}
 
@@ -207,28 +267,32 @@
   <!-- Sidebar -->
   <aside class="sidebar">
     <div class="brand">
-      <div class="stamp-mark">СВ</div>
+      <div class="stamp-mark">V</div>
       <div class="brand-text">
-        <div class="name">STAMP CRM</div>
-        <div class="sub">Визовое сопровождение</div>
+        <div class="name">Visa</div>
+        <div class="sub">CRM · визовое сопровождение</div>
       </div>
     </div>
     <nav class="nav">
       <button class="nav-item active" data-view="kanban">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="7" height="16" rx="1"/><rect x="14" y="4" width="7" height="9" rx="1"/></svg>
-        Воронка заявок <span class="nav-count">14</span>
+        Воронка заявок <span class="nav-count" id="navCountKanban">—</span>
+      </button>
+      <button class="nav-item" data-view="anketa">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 2h6l1 3H8l1-3z"/><rect x="5" y="4" width="14" height="18" rx="2"/><path d="M9 11h6M9 15h6M9 19h3"/></svg>
+        Анкета
       </button>
       <button class="nav-item" data-view="citizens">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.5-7 8-7s8 3 8 7"/></svg>
-        Иностранные граждане <span class="nav-count">9</span>
+        Иностранные граждане <span class="nav-count" id="navCountCitizens">—</span>
       </button>
       <button class="nav-item" data-view="clients">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21V7l7-4 7 4v14"/><path d="M10 21v-6h4v6"/></svg>
-        Клиенты <span class="nav-count">6</span>
+        Клиенты <span class="nav-count" id="navCountClients">—</span>
       </button>
       <button class="nav-item" data-view="docs">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
-        Документы <span class="nav-count">21</span>
+        Документы <span class="nav-count" id="navCountDocs">—</span>
       </button>
     </nav>
     <div class="sidebar-footer mono">
@@ -249,6 +313,83 @@
         <button class="btn-primary">+ Новая заявка</button>
       </div>
       <div class="kanban" id="kanbanBoard"></div>
+    </section>
+
+    <!-- ANKETA VIEW -->
+    <section class="view" id="view-anketa">
+      <div class="topbar">
+        <div>
+          <h1>Анкета иностранного гражданина</h1>
+          <p class="desc">Заполненная анкета автоматически создаёт заявку в разделе «Воронка заявок», этап «Новая заявка»</p>
+        </div>
+      </div>
+
+      <div class="success-banner" id="anketaSuccess">✔ Анкета сохранена. Заявка <span id="successId" class="mono"></span> добавлена в «Новую заявку».</div>
+
+      <div class="form-wrap">
+        <form class="form-panel" id="anketaForm">
+
+          <div class="form-section">
+            <h3>Личные данные гражданина</h3>
+            <div class="form-grid">
+              <div class="field"><label>ФИО (кириллица)</label><input type="text" id="f_name" placeholder="Иванов Иван Иванович"></div>
+              <div class="field"><label>ФИО (латиница, как в загранпаспорте) <span class="hint">не обязательно</span></label><input type="text" id="f_name_lat" placeholder="IVANOV IVAN"></div>
+              <div class="field"><label>Гражданство</label><select id="f_country"></select></div>
+              <div class="field"><label>Дата рождения</label><input type="date" id="f_dob"></div>
+              <div class="field"><label>Пол</label>
+                <select id="f_gender"><option value="М">Мужской</option><option value="Ж">Женский</option></select>
+              </div>
+              <div class="field"><label>Цель въезда</label>
+                <select id="f_purpose">
+                  <option>Работа</option><option>Деловая поездка</option><option>Переговоры / выставка</option><option>Консалтинг</option><option>Туризм</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h3>Паспортные данные</h3>
+            <div class="form-grid">
+              <div class="field"><label>Номер паспорта</label><input type="text" id="f_passport" placeholder="N1234567"></div>
+              <div class="field">
+                <label>Срок действия паспорта</label>
+                <input type="date" id="f_expiry">
+                <div id="expiryHint"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h3>Данные заявки</h3>
+            <div class="form-grid">
+              <div class="field"><label>Клиент (компания-заказчик)</label><select id="f_client"></select></div>
+              <div class="field"><label>Ответственный менеджер</label><select id="f_manager"></select></div>
+              <div class="field"><label>Тип визы</label>
+                <select id="f_visatype">
+                  <option>Рабочая, однократная</option><option>Рабочая, многократная</option><option>Деловая, однократная</option><option>Деловая, многократная</option>
+                </select>
+              </div>
+              <div class="field"><label>Город консульского учреждения</label><input type="text" id="f_city" value="Шымкент"></div>
+              <div class="field"><label>Плановая дата въезда</label><input type="date" id="f_entry"></div>
+              <div class="field"><label>Плановая дата выезда</label><input type="date" id="f_exit"></div>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn-primary">Сохранить и отправить в CRM</button>
+            <button type="button" class="btn-secondary" id="anketaReset">Очистить форму</button>
+            <span class="form-error" id="anketaError"></span>
+          </div>
+        </form>
+
+        <aside class="side-note">
+          <h4>Как это работает</h4>
+          Данные анкеты автоматически создают карточку иностранного гражданина и новую заявку на этапе «Новая заявка» в воронке.
+          <br><br>
+          Система проверяет срок действия паспорта: если до истечения осталось менее 6 месяцев, дальнейший переход по этапам заявки будет заблокирован.
+          <div class="stamp-mini" id="livePassportStatus">Укажите срок действия паспорта</div>
+        </aside>
+      </div>
     </section>
 
     <!-- CITIZENS VIEW -->
@@ -363,34 +504,47 @@ const columns = [
 ];
 
 const applications = [
-  {id:"VZ-1042", citizen:citizens[0], stage:"new", visaType:"Рабочая, однократная", manager:"АК", client:"ТОО «СтройИнвест Казахстан»", entryCity:"—"},
-  {id:"VZ-1044", citizen:citizens[5], stage:"new", visaType:"Рабочая, однократная", manager:"МЖ", client:'АО «Каспий Энергоресурсы»', entryCity:"—"},
-  {id:"VZ-1045", citizen:citizens[8], stage:"new", visaType:"Рабочая, многократная", manager:"ДТ", client:'ТОО «GreenField Agro»', entryCity:"—"},
+  // Черновики — анкеты, начатые сегодня/вчера, ещё не заполнены полностью
+  {id:"ЧРН-014", draft:true, stage:"new", started:"2026-08-07", startedLabel:"Сегодня, 15:40",
+    citizen:{name:"Мунхбат Батбаяр", flag:"🇲🇳", country:"Монголия", passport:"", expiry:"", dob:"", gender:"М", purpose:""},
+    manager:"ДТ", client:"ТОО «AlmatyBuild Group»", entryCity:"Шымкент"},
+  {id:"ЧРН-013", draft:true, stage:"new", started:"2026-08-07", startedLabel:"Сегодня, 10:05",
+    citizen:{name:"Джессика Мартин", flag:"🇫🇷", country:"Франция", passport:"", expiry:"", dob:"", gender:"Ж", purpose:""},
+    manager:"", client:"", entryCity:"Шымкент"},
+  {id:"ЧРН-012", draft:true, stage:"new", started:"2026-08-06", startedLabel:"Вчера, 18:22",
+    citizen:{name:"Фернанда Силва", flag:"🇧🇷", country:"Бразилия", passport:"", expiry:"", dob:"", gender:"Ж", purpose:""},
+    manager:"МЖ", client:"ИП «Нурланов Тимур»", entryCity:"Шымкент"},
 
-  {id:"VZ-1039", citizen:citizens[2], stage:"collect", visaType:"Рабочая, однократная", manager:"АК", client:'ТОО «СтройИнвест Казахстан»', entryCity:"Алматы"},
-  {id:"VZ-1040", citizen:citizens[6], stage:"collect", visaType:"Деловая, многократная", manager:"МЖ", client:'ИП «Нурланов Тимур»', entryCity:"Астана"},
+  {id:"VZ-1042", citizen:citizens[0], stage:"new", visaType:"Рабочая, однократная", manager:"АК", client:"ТОО «СтройИнвест Казахстан»", entryCity:"Шымкент"},
+  {id:"VZ-1044", citizen:citizens[5], stage:"new", visaType:"Рабочая, однократная", manager:"МЖ", client:'АО «Каспий Энергоресурсы»', entryCity:"Шымкент"},
+  {id:"VZ-1045", citizen:citizens[8], stage:"new", visaType:"Рабочая, многократная", manager:"ДТ", client:'ТОО «GreenField Agro»', entryCity:"Шымкент"},
 
-  {id:"VZ-1035", citizen:citizens[1], stage:"prepare", visaType:"Деловая, однократная", manager:"ДТ", client:'ТОО «TechnoLogistics»', entryCity:"Алматы"},
-  {id:"VZ-1036", citizen:citizens[4], stage:"prepare", visaType:"Рабочая, однократная", manager:"АК", client:'АО «Каспий Энергоресурсы»', entryCity:"Астана"},
+  {id:"VZ-1039", citizen:citizens[2], stage:"collect", visaType:"Рабочая, однократная", manager:"АК", client:'ТОО «СтройИнвест Казахстан»', entryCity:"Шымкент"},
+  {id:"VZ-1040", citizen:citizens[6], stage:"collect", visaType:"Деловая, многократная", manager:"МЖ", client:'ИП «Нурланов Тимур»', entryCity:"Шымкент"},
 
-  {id:"VZ-1028", citizen:citizens[3], stage:"submit", visaType:"Деловая, многократная", manager:"МЖ", client:'ТОО «TechnoLogistics»', entryCity:"Алматы", track:"ВМП-88213К"},
+  {id:"VZ-1035", citizen:citizens[1], stage:"prepare", visaType:"Деловая, однократная", manager:"ДТ", client:'ТОО «TechnoLogistics»', entryCity:"Шымкент"},
+  {id:"VZ-1036", citizen:citizens[4], stage:"prepare", visaType:"Рабочая, однократная", manager:"АК", client:'АО «Каспий Энергоресурсы»', entryCity:"Шымкент"},
+
+  {id:"VZ-1028", citizen:citizens[3], stage:"submit", visaType:"Деловая, многократная", manager:"МЖ", client:'ТОО «TechnoLogistics»', entryCity:"Шымкент", track:"ВМП-88213К"},
   {id:"VZ-1030", citizen:citizens[7], stage:"submit", visaType:"Рабочая, однократная", manager:"ДТ", client:'ТОО «AlmatyBuild Group»', entryCity:"Шымкент", track:"ВМП-88240К"},
 
-  {id:"VZ-1019", citizen:citizens[8], stage:"wait", visaType:"Рабочая, однократная", manager:"АК", client:'ТОО «GreenField Agro»', entryCity:"Алматы", track:"ВМП-87910К"},
-  {id:"VZ-1021", citizen:citizens[6], stage:"wait", visaType:"Деловая, однократная", manager:"МЖ", client:'ИП «Нурланов Тимур»', entryCity:"Астана", track:"ВМП-87955К"},
-  {id:"VZ-1022", citizen:citizens[3], stage:"wait", visaType:"Деловая, многократная", manager:"ДТ", client:'ТОО «TechnoLogistics»', entryCity:"Алматы", track:"ВМП-87961К"},
+  {id:"VZ-1019", citizen:citizens[8], stage:"wait", visaType:"Рабочая, однократная", manager:"АК", client:'ТОО «GreenField Agro»', entryCity:"Шымкент", track:"ВМП-87910К"},
+  {id:"VZ-1021", citizen:citizens[6], stage:"wait", visaType:"Деловая, однократная", manager:"МЖ", client:'ИП «Нурланов Тимур»', entryCity:"Шымкент", track:"ВМП-87955К"},
+  {id:"VZ-1022", citizen:citizens[3], stage:"wait", visaType:"Деловая, многократная", manager:"ДТ", client:'ТОО «TechnoLogistics»', entryCity:"Шымкент", track:"ВМП-87961К"},
 
-  {id:"VZ-0998", citizen:citizens[0], stage:"done", visaType:"Рабочая, однократная", manager:"АК", client:'ТОО «СтройИнвест Казахстан»', entryCity:"Алматы", track:"ВМП-86440К"},
-  {id:"VZ-1001", citizen:citizens[4], stage:"done", visaType:"Рабочая, однократная", manager:"МЖ", client:'АО «Каспий Энергоресурсы»', entryCity:"Астана", track:"ВМП-86502К"}
+  {id:"VZ-0998", citizen:citizens[0], stage:"done", visaType:"Рабочая, однократная", manager:"АК", client:'ТОО «СтройИнвест Казахстан»', entryCity:"Шымкент", track:"ВМП-86440К"},
+  {id:"VZ-1001", citizen:citizens[4], stage:"done", visaType:"Рабочая, однократная", manager:"МЖ", client:'АО «Каспий Энергоресурсы»', entryCity:"Шымкент", track:"ВМП-86502К"}
 ];
 
 function monthsUntil(dateStr){
+  if(!dateStr) return Infinity;
   const now = new Date("2026-08-07");
   const d = new Date(dateStr);
   return (d - now) / (1000*60*60*24*30.44);
 }
 
 function fmtDate(s){
+  if(!s) return "—";
   const [y,m,d] = s.split("-");
   return `${d}.${m}.${y}`;
 }
@@ -408,11 +562,27 @@ function renderKanban(){
     `;
     const cardsEl = colEl.querySelector('.kcards');
     apps.forEach(a=>{
+      const card = document.createElement('div');
+      card.onclick = ()=>openModal(a);
+
+      if(a.draft){
+        card.className = 'card draft';
+        card.innerHTML = `
+          <div class="card-top">
+            <span class="flag">${a.citizen.flag}</span>
+            <span class="card-name">${a.citizen.name || 'Без имени'}</span>
+          </div>
+          <div class="card-meta mono">${a.id} · черновик анкеты</div>
+          <span class="badge badge-draft">🕐 ${a.startedLabel}</span>
+          <div class="draft-note">Анкета заполняется, данные ещё не полные</div>
+        `;
+        cardsEl.appendChild(card);
+        return;
+      }
+
       const mo = monthsUntil(a.citizen.expiry);
       const warn = mo < 6;
-      const card = document.createElement('div');
       card.className = 'card';
-      card.onclick = ()=>openModal(a);
       card.innerHTML = `
         ${col.key==='new' && warn ? `<div class="stamp-flag red">ПАСПОРТ &lt; 6 МЕС</div>` : ''}
         <div class="card-top">
@@ -426,7 +596,7 @@ function renderKanban(){
         </div>
         <div class="card-row">
           <span class="mono track">${a.entryCity}</span>
-          <span class="avatar" title="${managers[a.manager]}">${a.manager}</span>
+          <span class="avatar" title="${managers[a.manager]||'Не назначен'}">${a.manager||'—'}</span>
         </div>
       `;
       cardsEl.appendChild(card);
@@ -436,21 +606,37 @@ function renderKanban(){
 }
 
 function openModal(a){
-  const mo = monthsUntil(a.citizen.expiry);
-  const warn = mo < 6;
   const stageTitle = columns.find(c=>c.key===a.stage).title;
   const modal = document.getElementById('modalBody');
+
+  if(a.draft){
+    modal.innerHTML = `
+      <button class="modal-close" onclick="closeModal()">✕</button>
+      <h2>${a.citizen.flag} ${a.citizen.name || 'Без имени'}</h2>
+      <div class="sub">${a.id} · Черновик анкеты · начат ${a.startedLabel.toLowerCase()}</div>
+      <div class="kv"><span class="k">Клиент</span><span class="v">${a.client || '—'}</span></div>
+      <div class="kv"><span class="k">Гражданство</span><span class="v">${a.citizen.country || '—'}</span></div>
+      <div class="kv"><span class="k">Паспорт</span><span class="v mono">${a.citizen.passport || '—'}</span></div>
+      <div class="kv"><span class="k">Ответственный</span><span class="v">${a.manager ? managers[a.manager] : '—'}</span></div>
+      <div class="stamp-big" style="background:var(--primary-bg); color:var(--navy);">✎ Анкета не завершена — данные ещё вносятся сотрудником</div>
+    `;
+    document.getElementById('overlay').classList.add('active');
+    return;
+  }
+
+  const mo = monthsUntil(a.citizen.expiry);
+  const warn = mo < 6;
   modal.innerHTML = `
     <button class="modal-close" onclick="closeModal()">✕</button>
     <h2>${a.citizen.flag} ${a.citizen.name}</h2>
     <div class="sub">Заявка #${a.id} · ${stageTitle}</div>
     <div class="kv"><span class="k">Клиент</span><span class="v">${a.client}</span></div>
     <div class="kv"><span class="k">Гражданство</span><span class="v">${a.citizen.country}</span></div>
-    <div class="kv"><span class="k">Паспорт</span><span class="v mono">${a.citizen.passport}</span></div>
+    <div class="kv"><span class="k">Паспорт</span><span class="v mono">${a.citizen.passport || '—'}</span></div>
     <div class="kv"><span class="k">Действителен до</span><span class="v mono">${fmtDate(a.citizen.expiry)}</span></div>
     <div class="kv"><span class="k">Тип визы</span><span class="v">${a.visaType}</span></div>
     <div class="kv"><span class="k">Город консульства</span><span class="v">${a.entryCity}</span></div>
-    <div class="kv"><span class="k">Ответственный</span><span class="v">${managers[a.manager]}</span></div>
+    <div class="kv"><span class="k">Ответственный</span><span class="v">${a.manager ? managers[a.manager] : '—'}</span></div>
     ${a.track ? `<div class="kv"><span class="k">Трек-номер ВМП</span><span class="v mono">${a.track}</span></div>` : ''}
     ${warn
       ? `<div class="stamp-big" style="background:var(--stamp-red-bg); color:var(--stamp-red);">⛔ ВАЛИДАТОР: паспорт истекает менее чем через 6 мес — переход заблокирован</div>`
@@ -505,6 +691,130 @@ function renderDocs(){
   }).join('');
 }
 
+function updateNavCounts(){
+  document.getElementById('navCountKanban').textContent = applications.length;
+  document.getElementById('navCountCitizens').textContent = citizens.length;
+  document.getElementById('navCountClients').textContent = clients.length;
+  document.getElementById('navCountDocs').textContent = docs.length;
+}
+
+// ---------- Анкета (форма добавления) ----------
+const countryFlags = {
+  "Индия":"🇮🇳","Турция":"🇹🇷","Узбекистан":"🇺🇿","Китай":"🇨🇳","Германия":"🇩🇪","Египет":"🇪🇬",
+  "Великобритания":"🇬🇧","Южная Корея":"🇰🇷","Украина":"🇺🇦","Монголия":"🇲🇳","Франция":"🇫🇷",
+  "Бразилия":"🇧🇷","Кыргызстан":"🇰🇬","Таджикистан":"🇹🇯","Индонезия":"🇮🇩","Вьетнам":"🇻🇳",
+  "Иордания":"🇯🇴","Казахстан":"🇰🇿","Россия":"🇷🇺","США":"🇺🇸","Италия":"🇮🇹","Польша":"🇵🇱"
+};
+
+function populateAnketaSelects(){
+  const countrySel = document.getElementById('f_country');
+  countrySel.innerHTML = Object.keys(countryFlags).sort((a,b)=>a.localeCompare(b,'ru'))
+    .map(c=>`<option value="${c}">${countryFlags[c]} ${c}</option>`).join('');
+
+  const clientSel = document.getElementById('f_client');
+  clientSel.innerHTML = '<option value="">— не выбран —</option>' +
+    clients.map(c=>`<option value="${c.name}">${c.name}</option>`).join('');
+
+  const managerSel = document.getElementById('f_manager');
+  managerSel.innerHTML = '<option value="">— не назначен —</option>' +
+    Object.entries(managers).map(([code,name])=>`<option value="${code}">${name}</option>`).join('');
+}
+
+function generateAppId(){
+  const nums = applications
+    .map(a=>a.id.match(/^VZ-(\d+)$/))
+    .filter(Boolean)
+    .map(m=>parseInt(m[1],10));
+  const max = nums.length ? Math.max(...nums) : 1000;
+  return "VZ-" + (max + 1);
+}
+
+function checkExpiryLive(){
+  const val = document.getElementById('f_expiry').value;
+  const hint = document.getElementById('expiryHint');
+  const status = document.getElementById('livePassportStatus');
+  const input = document.getElementById('f_expiry');
+  if(!val){
+    hint.innerHTML = '';
+    input.classList.remove('warn-input');
+    status.className = 'stamp-mini';
+    status.style.background = '';
+    status.style.color = '';
+    status.textContent = 'Укажите срок действия паспорта';
+    return;
+  }
+  const mo = monthsUntil(val);
+  if(mo < 6){
+    hint.innerHTML = '<div class="inline-warn">⛔ Менее 6 месяцев — переход по этапам будет заблокирован</div>';
+    input.classList.add('warn-input');
+    status.style.background = 'var(--stamp-red-bg)';
+    status.style.color = 'var(--stamp-red)';
+    status.textContent = '⛔ Валидатор: паспорт истекает менее чем через 6 мес.';
+  } else {
+    hint.innerHTML = '<div class="inline-ok">✔ Срок действия в норме</div>';
+    input.classList.remove('warn-input');
+    status.style.background = 'var(--success-bg)';
+    status.style.color = 'var(--success)';
+    status.textContent = '✔ Срок действия паспорта в норме';
+  }
+}
+document.getElementById('f_expiry').addEventListener('change', checkExpiryLive);
+document.getElementById('f_expiry').addEventListener('input', checkExpiryLive);
+
+document.getElementById('anketaReset').addEventListener('click', ()=>{
+  document.getElementById('anketaForm').reset();
+  document.getElementById('f_city').value = 'Шымкент';
+  checkExpiryLive();
+  document.getElementById('anketaError').textContent = '';
+});
+
+document.getElementById('anketaForm').addEventListener('submit', (e)=>{
+  e.preventDefault();
+  const errEl = document.getElementById('anketaError');
+  const name = document.getElementById('f_name').value.trim();
+  const country = document.getElementById('f_country').value;
+  const passport = document.getElementById('f_passport').value.trim();
+  const expiry = document.getElementById('f_expiry').value;
+
+  if(!name || !passport || !expiry){
+    errEl.textContent = 'Заполните ФИО, номер паспорта и срок действия паспорта';
+    return;
+  }
+  errEl.textContent = '';
+
+  const newCitizen = {
+    name, flag: countryFlags[country] || '🏳️', country,
+    passport, expiry,
+    dob: document.getElementById('f_dob').value,
+    gender: document.getElementById('f_gender').value,
+    purpose: document.getElementById('f_purpose').value
+  };
+  citizens.push(newCitizen);
+
+  const newApp = {
+    id: generateAppId(),
+    citizen: newCitizen,
+    stage: "new",
+    visaType: document.getElementById('f_visatype').value,
+    manager: document.getElementById('f_manager').value,
+    client: document.getElementById('f_client').value || "—",
+    entryCity: document.getElementById('f_city').value || "Шымкент"
+  };
+  applications.unshift(newApp);
+
+  renderKanban();
+  renderCitizens();
+  updateNavCounts();
+
+  document.getElementById('successId').textContent = '#' + newApp.id;
+  document.getElementById('anketaSuccess').classList.add('active');
+  document.getElementById('anketaForm').reset();
+  document.getElementById('f_city').value = 'Шымкент';
+  checkExpiryLive();
+  window.scrollTo({top:0, behavior:'smooth'});
+  setTimeout(()=>document.getElementById('anketaSuccess').classList.remove('active'), 6000);
+});
+
 // Nav switching
 document.querySelectorAll('.nav-item').forEach(btn=>{
   btn.addEventListener('click', ()=>{
@@ -515,10 +825,12 @@ document.querySelectorAll('.nav-item').forEach(btn=>{
   });
 });
 
+populateAnketaSelects();
 renderKanban();
 renderCitizens();
 renderClients();
 renderDocs();
+updateNavCounts();
 </script>
 </body>
 </html>
