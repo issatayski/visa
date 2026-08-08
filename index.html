@@ -37,7 +37,7 @@
   .mono{font-family:'IBM Plex Mono', monospace;}
 
   /* ---------- Layout ---------- */
-  .app{display:grid; grid-template-columns:248px 1fr; min-height:100vh;}
+  .app{display:grid; grid-template-columns:auto 1fr; min-height:100vh;}
 
   /* Sidebar */
   .sidebar{
@@ -47,8 +47,25 @@
     display:flex; flex-direction:column;
     position:sticky; top:0; height:100vh;
     border-right:1px solid var(--line);
+    width:248px;
+    flex-shrink:0;
+    overflow:hidden;
+    transition:width .18s ease, padding .18s ease;
   }
-  .brand{display:flex; align-items:center; gap:10px; padding:6px 8px 22px 8px;}
+  .sidebar.collapsed{width:72px; padding:20px 10px;}
+
+  .sidebar-toggle{
+    position:absolute; top:26px; right:-12px; width:24px; height:24px; border-radius:50%;
+    background:#fff; border:1px solid var(--line); box-shadow:0 1px 3px rgba(0,0,0,.1);
+    display:flex; align-items:center; justify-content:center; cursor:pointer;
+    color:var(--muted); z-index:5; font-size:13px; line-height:1; padding:0;
+    transition:color .15s, border-color .15s;
+  }
+  .sidebar-toggle:hover{color:var(--navy); border-color:var(--navy);}
+  .sidebar-toggle svg{width:13px; height:13px; transition:transform .18s ease;}
+  .sidebar.collapsed .sidebar-toggle svg{transform:rotate(180deg);}
+
+  .brand{display:flex; align-items:center; gap:10px; padding:6px 8px 22px 8px; white-space:nowrap;}
   .stamp-mark{
     width:32px; height:32px; border-radius:8px;
     background:var(--navy);
@@ -57,9 +74,11 @@
     font-family:'IBM Plex Mono', monospace;
     flex-shrink:0;
   }
-  .brand-text{line-height:1.1;}
+  .brand-text{line-height:1.1; overflow:hidden;}
   .brand-text .name{font-weight:700; font-size:17px; letter-spacing:-.01em; color:var(--ink);}
-  .brand-text .sub{font-size:10.5px; color:var(--muted); margin-top:2px;}
+  .brand-text .sub{font-size:10.5px; color:var(--muted); margin-top:2px; white-space:nowrap;}
+  .sidebar.collapsed .brand-text{display:none;}
+  .sidebar.collapsed .brand{justify-content:center; padding:6px 0 22px 0;}
 
   .nav{display:flex; flex-direction:column; gap:2px; margin-top:8px;}
   .nav-item{
@@ -68,6 +87,7 @@
     color:#5B6472; font-size:13.5px; font-weight:500;
     cursor:pointer; border:none; background:none; text-align:left; width:100%;
     transition:background .15s, color .15s;
+    white-space:nowrap; overflow:hidden;
   }
   .nav-item svg{width:17px; height:17px; opacity:.8; flex-shrink:0;}
   .nav-item:hover{background:#F3F5F8; color:var(--ink);}
@@ -76,16 +96,21 @@
   .nav-count{
     margin-left:auto; font-family:'IBM Plex Mono', monospace; font-size:10.5px;
     color:var(--muted); background:#F0F1F4; padding:1px 7px; border-radius:20px;
+    flex-shrink:0;
   }
   .nav-item.active .nav-count{background:#DCEBFD; color:var(--navy);}
+  .sidebar.collapsed .nav-item{justify-content:center; padding:12px 8px;}
+  .sidebar.collapsed .nav-label,
+  .sidebar.collapsed .nav-count{display:none;}
 
   .sidebar-footer{
     margin-top:auto; padding:14px 10px; border-top:1px solid var(--line);
-    font-size:10.5px; color:var(--muted); line-height:1.5;
+    font-size:10.5px; color:var(--muted); line-height:1.5; white-space:nowrap; overflow:hidden;
   }
+  .sidebar.collapsed .sidebar-footer{display:none;}
 
   /* Main */
-  .main{padding:28px 34px 60px 34px; max-width:1400px;}
+  .main{padding:28px 34px 60px 34px; max-width:1400px; min-width:0;}
   .topbar{display:flex; align-items:flex-end; justify-content:space-between; margin-bottom:26px; flex-wrap:wrap; gap:14px;}
   .topbar h1{font-size:22px; margin:0 0 4px 0; font-weight:700; letter-spacing:-.01em;}
   .topbar .desc{color:var(--muted); font-size:13.5px; margin:0;}
@@ -266,20 +291,10 @@
   ::-webkit-scrollbar-thumb{background:#C9C7BB; border-radius:20px;}
 
   @media (max-width:820px){
-    .app{grid-template-columns:72px 1fr;}
-    .sidebar{padding:16px 10px; align-items:center;}
-    .brand{padding:6px 0 20px 0; justify-content:center;}
-    .brand-text{display:none;}
-    .nav{width:100%;}
-    .nav-item{justify-content:center; padding:12px 8px;}
-    .nav-label{display:none;}
-    .nav-count{display:none;}
-    .sidebar-footer{display:none;}
     .main{padding:20px 16px;}
   }
   @media (max-width:520px){
-    .app{grid-template-columns:60px 1fr;}
-    .sidebar{padding:12px 6px;}
+    .sidebar:not(.collapsed){position:fixed; z-index:40; box-shadow:0 0 0 100vw rgba(22,33,62,.35);}
     .nav-item svg{width:19px; height:19px;}
   }
 </style>
@@ -288,7 +303,10 @@
 
 <div class="app">
   <!-- Sidebar -->
-  <aside class="sidebar">
+  <aside class="sidebar" id="sidebar">
+    <button class="sidebar-toggle" id="sidebarToggle" title="Свернуть меню">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
     <div class="brand">
       <div class="stamp-mark">V</div>
       <div class="brand-text">
@@ -938,6 +956,18 @@ document.getElementById('anketaForm').addEventListener('submit', (e)=>{
   window.scrollTo({top:0, behavior:'smooth'});
   setTimeout(()=>document.getElementById('anketaSuccess').classList.remove('active'), 6000);
 });
+
+// Sidebar collapse toggle
+const sidebarEl = document.getElementById('sidebar');
+const sidebarToggleBtn = document.getElementById('sidebarToggle');
+function setSidebarCollapsed(collapsed){
+  sidebarEl.classList.toggle('collapsed', collapsed);
+  sidebarToggleBtn.title = collapsed ? 'Развернуть меню' : 'Свернуть меню';
+}
+sidebarToggleBtn.addEventListener('click', ()=>{
+  setSidebarCollapsed(!sidebarEl.classList.contains('collapsed'));
+});
+setSidebarCollapsed(window.innerWidth < 900);
 
 // Nav switching
 document.querySelectorAll('.nav-item').forEach(btn=>{
