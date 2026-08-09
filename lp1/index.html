@@ -1,0 +1,1092 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VisaRK — Легальное оформление иностранных специалистов в Казахстане</title>
+<meta name="description" content="Оформление ИРС, деловых виз и миграционного учета для иностранных специалистов в Казахстане. Прозрачный контроль каждого этапа через личный кабинет.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,500&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#16223E;
+    --ink-70:#3E4A66;
+    --paper:#EFF0E8;
+    --paper-deep:#E4E4D8;
+    --card:#F8F8F2;
+    --stamp:#A8332A;
+    --stamp-deep:#7E2620;
+    --brass:#93762E;
+    --line:#C7C2AC;
+    --ok:#3F6B4F;
+    --radius:2px;
+    --max:1180px;
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  html, body{overflow-x:hidden;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'IBM Plex Sans', sans-serif;
+    -webkit-font-smoothing:antialiased;
+    line-height:1.5;
+  }
+  h1,h2,h3{
+    font-family:'Newsreader', serif;
+    font-weight:600;
+    margin:0;
+    letter-spacing:-0.01em;
+  }
+  .mono{
+    font-family:'IBM Plex Mono', monospace;
+    letter-spacing:0.04em;
+  }
+  a{color:inherit;}
+  img,svg{display:block;max-width:100%;}
+  button{font-family:inherit;cursor:pointer;}
+  .wrap{max-width:var(--max); margin:0 auto; padding:0 24px;}
+  :focus-visible{outline:2px solid var(--stamp); outline-offset:3px;}
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.01ms !important; animation-iteration-count:1 !important; transition-duration:0.01ms !important; scroll-behavior:auto !important;}
+  }
+
+  /* ---------- eyebrow / field-code labels ---------- */
+  .field-code{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    color:var(--brass);
+    margin-bottom:14px;
+  }
+  .field-code::before{
+    content:"";
+    width:16px; height:1px;
+    background:var(--brass);
+  }
+
+  /* ---------- header / letterhead ---------- */
+  .letterhead{
+    position:sticky; top:0; z-index:50;
+    background:rgba(239,240,232,0.92);
+    backdrop-filter:blur(6px);
+    border-bottom:1px solid var(--line);
+  }
+  .letterhead-inner{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:16px 0;
+    gap:16px;
+  }
+  .brand{
+    display:flex; align-items:center; gap:10px;
+    font-family:'Newsreader', serif;
+    font-weight:600;
+    font-size:20px;
+    letter-spacing:0.01em;
+  }
+  .brand-mark{
+    width:30px; height:30px;
+    border:1.5px solid var(--stamp);
+    border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    color:var(--stamp);
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px; font-weight:600;
+    flex-shrink:0;
+  }
+  .letter-meta{
+    display:none;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    color:var(--ink-70);
+    text-align:right;
+    line-height:1.4;
+  }
+  .header-actions{
+    display:flex; align-items:center; gap:18px;
+  }
+  .header-phone{
+    display:none;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:13px;
+  }
+  .btn{
+    display:inline-flex; align-items:center; justify-content:center; gap:8px;
+    padding:12px 22px;
+    border:1px solid var(--ink);
+    border-radius:var(--radius);
+    background:transparent;
+    color:var(--ink);
+    font-size:14px; font-weight:600;
+    text-decoration:none;
+    transition:transform 0.15s ease, background 0.15s ease, color 0.15s ease;
+    white-space:nowrap;
+  }
+  .btn:hover{transform:translateY(-1px);}
+  .btn-stamp{
+    background:var(--stamp);
+    border-color:var(--stamp);
+    color:#fff;
+  }
+  .btn-stamp:hover{background:var(--stamp-deep); border-color:var(--stamp-deep);}
+  .btn-sm{padding:9px 16px; font-size:13px;}
+
+  /* ---------- hero ---------- */
+  .hero{
+    padding:72px 0 88px;
+    position:relative;
+    overflow:hidden;
+  }
+  .hero-grid{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:56px;
+    align-items:center;
+  }
+  .hero-grid > *{min-width:0;}
+  .hero-eyebrow-row{
+    display:flex; align-items:center; gap:10px;
+    margin-bottom:22px;
+  }
+  .hero h1{
+    font-size:clamp(32px, 5.6vw, 54px);
+    line-height:1.06;
+    color:var(--ink);
+  }
+  .hero h1 em{
+    font-style:italic;
+    color:var(--stamp);
+  }
+  .hero p.lede{
+    margin-top:22px;
+    font-size:17px;
+    color:var(--ink-70);
+    max-width:46ch;
+  }
+  .hero-cta-row{
+    margin-top:34px;
+    display:flex; flex-wrap:wrap; align-items:center; gap:18px;
+  }
+  .hero-note{
+    display:flex; align-items:center; gap:10px;
+    font-size:13px;
+    color:var(--ink-70);
+    max-width:26ch;
+  }
+  .hero-note .dot{
+    width:7px; height:7px; border-radius:50%;
+    background:var(--ok);
+    flex-shrink:0;
+    position:relative;
+  }
+  .hero-note .dot::after{
+    content:"";
+    position:absolute; inset:-4px;
+    border-radius:50%;
+    border:1px solid var(--ok);
+    opacity:0.5;
+  }
+
+  /* stamp visual */
+  .hero-visual{
+    position:relative;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    min-height:320px;
+  }
+  .doc-card{
+    position:relative;
+    width:280px;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:26px 24px 30px;
+    box-shadow:0 30px 60px -30px rgba(22,34,62,0.35);
+    transform:rotate(-3deg);
+  }
+  .doc-card .doc-top{
+    display:flex; justify-content:space-between; align-items:flex-start;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10px;
+    color:var(--ink-70);
+    text-transform:uppercase;
+    letter-spacing:0.08em;
+    border-bottom:1px dashed var(--line);
+    padding-bottom:14px;
+  }
+  .doc-card .doc-line{
+    margin-top:16px;
+    height:9px;
+    border-radius:2px;
+    background:var(--paper-deep);
+  }
+  .doc-card .doc-line.short{width:60%;}
+  .doc-card .doc-status{
+    margin-top:22px;
+    display:inline-flex; align-items:center; gap:8px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    color:var(--ok);
+    text-transform:uppercase;
+    letter-spacing:0.06em;
+  }
+  .doc-card .doc-status .dot{width:6px;height:6px;border-radius:50%;background:var(--ok);}
+
+  .stamp-seal{
+    position:absolute;
+    right:-6px; top:-30px;
+    width:168px; height:168px;
+    animation:stamp-in 0.9s cubic-bezier(.2,1.4,.4,1) 0.25s both;
+  }
+  @keyframes stamp-in{
+    0%{opacity:0; transform:scale(1.6) rotate(-24deg);}
+    60%{opacity:1;}
+    100%{opacity:1; transform:scale(1) rotate(14deg);}
+  }
+  .stamp-seal svg{width:100%; height:100%;}
+
+  /* ---------- section shell ---------- */
+  section{padding:88px 0;}
+  .section-head{
+    max-width:640px;
+    margin-bottom:56px;
+  }
+  .section-head h2{
+    font-size:clamp(26px, 3.4vw, 38px);
+    color:var(--ink);
+  }
+  .section-head p{
+    margin-top:16px;
+    color:var(--ink-70);
+    font-size:16px;
+  }
+
+  .reveal{
+    opacity:0;
+    transform:translateY(18px);
+    transition:opacity 0.6s ease, transform 0.6s ease;
+  }
+  .reveal.is-visible{opacity:1; transform:translateY(0);}
+
+  /* ---------- problems ---------- */
+  .problems{background:var(--paper-deep);}
+  .problem-grid{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:1px;
+    background:var(--line);
+    border:1px solid var(--line);
+  }
+  .problem-grid > *{min-width:0;}
+  .problem-item{
+    background:var(--paper-deep);
+    padding:30px 28px;
+    position:relative;
+  }
+  .problem-item .p-num{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    color:var(--stamp);
+    display:block;
+    margin-bottom:14px;
+  }
+  .problem-item h3{
+    font-family:'IBM Plex Sans', sans-serif;
+    font-weight:600;
+    font-size:16.5px;
+    line-height:1.4;
+  }
+
+  /* ---------- solutions ---------- */
+  .solution-grid{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:20px;
+  }
+  .solution-grid > *{min-width:0;}
+  .solution-card{
+    background:var(--card);
+    border:1px solid var(--line);
+    padding:28px 26px;
+    position:relative;
+  }
+  .solution-card::before,
+  .solution-card::after{
+    content:"";
+    position:absolute;
+    width:14px; height:14px;
+    border-color:var(--brass);
+    border-style:solid;
+    opacity:0.7;
+  }
+  .solution-card::before{top:-1px; left:-1px; border-width:1.5px 0 0 1.5px;}
+  .solution-card::after{bottom:-1px; right:-1px; border-width:0 1.5px 1.5px 0;}
+  .solution-code{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    letter-spacing:0.08em;
+    color:var(--brass);
+    text-transform:uppercase;
+    display:inline-block;
+    padding:4px 9px;
+    border:1px solid var(--brass);
+    border-radius:2px;
+    margin-bottom:16px;
+  }
+  .solution-card h3{
+    font-size:19px;
+    font-weight:600;
+    font-family:'IBM Plex Sans', sans-serif;
+  }
+  .solution-card p{
+    margin-top:10px;
+    font-size:14.5px;
+    color:var(--ink-70);
+  }
+
+  /* ---------- advantages / stamp trail ---------- */
+  .advantages{background:var(--ink); color:var(--paper);}
+  .advantages .section-head p{color:#B9C0D4;}
+  .advantages .field-code{color:#D8B564;}
+  .trail{
+    position:relative;
+    display:grid;
+    grid-template-columns:1fr;
+    gap:40px;
+  }
+  .trail > *{min-width:0;}
+  .trail::before{
+    content:none;
+  }
+  .trail-item{
+    display:flex; align-items:flex-start; gap:18px;
+  }
+  .trail-stamp{
+    flex-shrink:0;
+    width:58px; height:58px;
+    border-radius:50%;
+    border:1.5px dashed rgba(216,181,100,0.65);
+    display:flex; align-items:center; justify-content:center;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    color:#D8B564;
+  }
+  .trail-text h3{
+    font-family:'IBM Plex Sans', sans-serif;
+    font-weight:600;
+    font-size:16.5px;
+    color:#fff;
+    margin-bottom:6px;
+  }
+  .trail-text p{
+    font-size:14.5px;
+    color:#B9C0D4;
+    margin:0;
+  }
+
+  /* ---------- calculator ---------- */
+  .calc-panel{
+    background:var(--card);
+    border:1px solid var(--line);
+    padding:34px 28px;
+    display:grid;
+    grid-template-columns:1fr;
+    gap:28px;
+  }
+  .calc-panel > *{min-width:0;}
+  .calc-fields{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:18px;
+    min-width:0;
+  }
+  .field{
+    display:flex; flex-direction:column; gap:8px;
+    min-width:0;
+  }
+  .field label{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:0.08em;
+    color:var(--ink-70);
+  }
+  select, input{
+    width:100%;
+    min-width:0;
+    font-family:'IBM Plex Sans', sans-serif;
+    font-size:15px;
+    padding:12px 14px;
+    border:1px solid var(--line);
+    border-radius:2px;
+    background:#fff;
+    color:var(--ink);
+  }
+  select:focus, input:focus{border-color:var(--ink);}
+  .calc-result{
+    border-top:1px dashed var(--line);
+    padding-top:22px;
+    display:flex;
+    flex-wrap:wrap;
+    gap:32px;
+  }
+  .calc-stat{min-width:120px;}
+  .calc-stat .num{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:34px;
+    font-weight:600;
+    color:var(--stamp);
+    line-height:1;
+  }
+  .calc-stat .lbl{
+    margin-top:8px;
+    font-size:12.5px;
+    color:var(--ink-70);
+  }
+  .calc-disclaimer{
+    font-size:12px;
+    color:var(--ink-70);
+    font-style:italic;
+  }
+
+  /* ---------- lead form ---------- */
+  .form-section{background:var(--paper-deep);}
+  .form-shell{
+    background:var(--card);
+    border:1px solid var(--line);
+    padding:0;
+    max-width:760px;
+    margin:0 auto;
+  }
+  .form-shell-head{
+    padding:28px 32px;
+    border-bottom:1px dashed var(--line);
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:16px;
+    flex-wrap:wrap;
+  }
+  .form-shell-head h2{font-size:24px;}
+  .form-shell-head .mono{font-size:11px; color:var(--ink-70);}
+  form#lead-form{padding:30px 32px 34px;}
+  .form-row{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:18px;
+    margin-bottom:18px;
+  }
+  .form-row > *{min-width:0;}
+  @media(min-width:640px){
+    .form-row.two{grid-template-columns:1fr 1fr;}
+  }
+  .form-footer-row{
+    display:flex; align-items:center; justify-content:space-between;
+    flex-wrap:wrap; gap:16px;
+    margin-top:6px;
+  }
+  .form-privacy{font-size:12px; color:var(--ink-70); max-width:38ch;}
+  #form-success{
+    display:none;
+    padding:30px 32px 36px;
+    text-align:center;
+  }
+  #form-success.show{display:block;}
+  form#lead-form.hide{display:none;}
+  .success-stamp{
+    width:84px; height:84px;
+    margin:0 auto 18px;
+    border-radius:50%;
+    border:2px solid var(--ok);
+    display:flex; align-items:center; justify-content:center;
+    color:var(--ok);
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    transform:scale(0);
+    animation:stamp-pop 0.5s cubic-bezier(.2,1.6,.4,1) forwards;
+  }
+  @keyframes stamp-pop{
+    0%{transform:scale(1.8) rotate(-12deg); opacity:0;}
+    70%{transform:scale(0.95) rotate(-2deg); opacity:1;}
+    100%{transform:scale(1) rotate(-4deg); opacity:1;}
+  }
+  #form-success h3{font-size:22px; margin-bottom:10px;}
+  #form-success p{color:var(--ink-70); font-size:14.5px; max-width:44ch; margin:0 auto;}
+
+  /* ---------- FAQ ---------- */
+  .faq-list{border-top:1px solid var(--line);}
+  .faq-item{border-bottom:1px solid var(--line);}
+  .faq-q{
+    width:100%;
+    display:flex; align-items:center; gap:18px;
+    background:none; border:none;
+    padding:22px 0;
+    text-align:left;
+    color:var(--ink);
+  }
+  .faq-q .qnum{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    color:var(--brass);
+    flex-shrink:0;
+    width:30px;
+  }
+  .faq-q .qtext{
+    flex:1;
+    font-size:16px;
+    font-weight:600;
+    font-family:'IBM Plex Sans', sans-serif;
+  }
+  .faq-q .qicon{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:18px;
+    color:var(--ink-70);
+    transition:transform 0.25s ease;
+    flex-shrink:0;
+  }
+  .faq-item.open .qicon{transform:rotate(45deg);}
+  .faq-a{
+    max-height:0;
+    overflow:hidden;
+    transition:max-height 0.3s ease;
+  }
+  .faq-a-inner{
+    padding:0 0 24px 48px;
+    font-size:14.5px;
+    color:var(--ink-70);
+    max-width:60ch;
+  }
+
+  /* ---------- footer ---------- */
+  footer{
+    background:var(--ink);
+    color:#B9C0D4;
+    padding:56px 0 30px;
+    font-size:13px;
+  }
+  .footer-top{
+    display:flex; flex-wrap:wrap; justify-content:space-between; gap:32px;
+    padding-bottom:30px;
+    border-bottom:1px solid rgba(185,192,212,0.2);
+  }
+  .footer-brand{
+    display:flex; align-items:center; gap:10px;
+    color:#fff;
+    font-family:'Newsreader', serif;
+    font-size:18px;
+    font-weight:600;
+  }
+  .footer-links{
+    display:flex; gap:28px; flex-wrap:wrap;
+  }
+  .footer-links a{text-decoration:none; color:#B9C0D4;}
+  .footer-links a:hover{color:#fff;}
+  .footer-bottom{
+    padding-top:22px;
+    display:flex; justify-content:space-between; flex-wrap:wrap; gap:12px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11.5px;
+    color:#7C87A3;
+  }
+
+  /* ---------- responsive ---------- */
+  @media(min-width:720px){
+    .header-phone{display:block;}
+    .letter-meta{display:block;}
+  }
+  @media(min-width:860px){
+    .problem-grid{grid-template-columns:1fr 1fr;}
+    .solution-grid{grid-template-columns:1fr 1fr;}
+    .trail{grid-template-columns:1fr 1fr;}
+  }
+  @media(min-width:980px){
+    .hero-grid{grid-template-columns:1.1fr 0.9fr;}
+    .calc-panel{grid-template-columns:1fr 1fr; align-items:start;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ================= HEADER / LETTERHEAD ================= -->
+<header class="letterhead">
+  <div class="wrap letterhead-inner">
+    <div class="brand">
+      <span class="brand-mark">V</span>
+      VisaRK
+    </div>
+    <div class="letter-meta mono" id="regNumber"></div>
+    <div class="header-actions">
+      <span class="header-phone mono">+7 (700) 000-00-00</span>
+      <a href="#lead-form" class="btn btn-stamp btn-sm">Получить консультацию</a>
+    </div>
+  </div>
+</header>
+
+<!-- ================= HERO ================= -->
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <div class="hero-eyebrow-row">
+        <span class="field-code">Форма № MIGR-01 · Оформление персонала</span>
+      </div>
+      <h1>Легальное оформление <em>иностранных специалистов</em> в Казахстане под ключ</h1>
+      <p class="lede">Берём на себя всю миграционную цепочку: от разрешений на ИРС и бизнес-приглашений до виз и постановки на учёт. Без бюрократии и рисков штрафов.</p>
+      <div class="hero-cta-row">
+        <a href="#lead-form" class="btn btn-stamp">Оставить заявку на оформление</a>
+        <div class="hero-note">
+          <span class="dot"></span>
+          Прозрачный контроль каждого этапа через личный кабинет
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-visual">
+      <div class="doc-card reveal is-visible">
+        <div class="doc-top">
+          <span>Дело № 2026-0714</span>
+          <span>ИРС / C3</span>
+        </div>
+        <div class="doc-line"></div>
+        <div class="doc-line short"></div>
+        <div class="doc-line" style="margin-top:20px;"></div>
+        <div class="doc-status"><span class="dot"></span>В обработке</div>
+      </div>
+      <div class="stamp-seal" aria-hidden="true">
+        <svg viewBox="0 0 200 200">
+          <circle cx="100" cy="100" r="92" fill="none" stroke="#A8332A" stroke-width="3"/>
+          <circle cx="100" cy="100" r="78" fill="none" stroke="#A8332A" stroke-width="1.5"/>
+          <path id="stampArc" d="M 30,100 A 70,70 0 1,1 170,100" fill="none"/>
+          <text font-family="IBM Plex Mono, monospace" font-size="11" fill="#A8332A" letter-spacing="2">
+            <textPath href="#stampArc" startOffset="2%">ОФОРМЛЕНО · ЗАКОННО · VisaRK ·</textPath>
+          </text>
+          <text x="100" y="95" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="15" fill="#A8332A" font-weight="600">СОГЛАСОВАНО</text>
+          <text x="100" y="118" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="#A8332A">РЕСПУБЛИКА КАЗАХСТАН</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= PROBLEMS ================= -->
+<section class="problems">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="field-code">Раздел 02 · С чем сталкивается бизнес</span>
+      <h2>Наём иностранного сотрудника редко проходит по плану</h2>
+      <p>Даже опытные HR-отделы теряют недели на процессы, где цена ошибки — штраф или депортация специалиста.</p>
+    </div>
+
+    <div class="problem-grid reveal">
+      <div class="problem-item">
+        <span class="p-num mono">ПРОБЛЕМА № 01</span>
+        <h3>Потеря времени в очередях и долгие согласования в госорганах</h3>
+      </div>
+      <div class="problem-item">
+        <span class="p-num mono">ПРОБЛЕМА № 02</span>
+        <h3>Риск крупных штрафов или депортации сотрудников из-за ошибок в документах</h3>
+      </div>
+      <div class="problem-item">
+        <span class="p-num mono">ПРОБЛЕМА № 03</span>
+        <h3>Непрозрачность процесса — HR не знает текущий статус оформления</h3>
+      </div>
+      <div class="problem-item">
+        <span class="p-num mono">ПРОБЛЕМА № 04</span>
+        <h3>Постоянные изменения в миграционном законодательстве РК</h3>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SOLUTIONS ================= -->
+<section id="solutions">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="field-code">Раздел 03 · Наши услуги</span>
+      <h2>Полный пакет для легального найма</h2>
+      <p>Каждая услуга закрывает отдельный этап миграционной цепочки — от разрешения до продления пребывания.</p>
+    </div>
+
+    <div class="solution-grid reveal">
+      <div class="solution-card">
+        <span class="solution-code">ИРС</span>
+        <h3>Разрешение на привлечение иностранной рабочей силы</h3>
+        <p>Расчёт квоты, подготовка обоснования и сопровождение до получения разрешения.</p>
+      </div>
+      <div class="solution-card">
+        <span class="solution-code">C3 / C4</span>
+        <h3>Деловые и рабочие визы, официальные приглашения</h3>
+        <p>Оформление приглашений и виз для сотрудников и деловых партнёров.</p>
+      </div>
+      <div class="solution-card">
+        <span class="solution-code">УЧЁТ</span>
+        <h3>Миграционный учёт и продление пребывания</h3>
+        <p>Постановка на учёт при въезде и своевременное продление сроков пребывания.</p>
+      </div>
+      <div class="solution-card">
+        <span class="solution-code">АУДИТ</span>
+        <h3>Комплексный аудит имеющейся документации</h3>
+        <p>Проверка уже оформленных документов на соответствие требованиям миграционного права РК.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= ADVANTAGES ================= -->
+<section class="advantages">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="field-code">Раздел 04 · Почему выбирают нас</span>
+      <h2>Каждый этап оставляет след</h2>
+      <p>Как и в паспорте — каждое действие фиксируется и подтверждается. Вы видите весь путь заявки.</p>
+    </div>
+
+    <div class="trail reveal">
+      <div class="trail-item">
+        <div class="trail-stamp mono">01</div>
+        <div class="trail-text">
+          <h3>Прозрачность</h3>
+          <p>Доступ к системе отслеживания статуса документов в реальном времени.</p>
+        </div>
+      </div>
+      <div class="trail-item">
+        <div class="trail-stamp mono">02</div>
+        <div class="trail-text">
+          <h3>Экспертность</h3>
+          <p>Глубокое знание актуального миграционного права РК.</p>
+        </div>
+      </div>
+      <div class="trail-item">
+        <div class="trail-stamp mono">03</div>
+        <div class="trail-text">
+          <h3>Скорость</h3>
+          <p>Оптимизированные процессы подготовки пакета документов.</p>
+        </div>
+      </div>
+      <div class="trail-item">
+        <div class="trail-stamp mono">04</div>
+        <div class="trail-text">
+          <h3>Юридическая ответственность</h3>
+          <p>Гарантия корректности оформления на каждом этапе.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CALCULATOR ================= -->
+<section id="calculator">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="field-code">Раздел 05 · Предварительный расчёт</span>
+      <h2>Оцените срок оформления</h2>
+      <p>Выберите гражданство сотрудника и нужный документ — покажем ориентировочные сроки.</p>
+    </div>
+
+    <div class="calc-panel reveal">
+      <div class="calc-fields">
+        <div class="field">
+          <label for="calc-nationality">Гражданство сотрудника</label>
+          <select id="calc-nationality">
+            <option value="cis">Узбекистан / Кыргызстан / Таджикистан</option>
+            <option value="ru">Россия</option>
+            <option value="far">Индия / Турция / Китай / другое дальнее зарубежье</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="calc-doctype">Требуемый документ</label>
+          <select id="calc-doctype">
+            <option value="irs">Разрешение на ИРС</option>
+            <option value="visa">Деловая / рабочая виза (C3, C4)</option>
+            <option value="invite">Официальное приглашение</option>
+            <option value="reg">Постановка на миграционный учёт</option>
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <div class="calc-result">
+          <div class="calc-stat">
+            <div class="num" id="calc-days">—</div>
+            <div class="lbl">рабочих дней, ориентировочно</div>
+          </div>
+          <div class="calc-stat">
+            <div class="num" id="calc-docs">—</div>
+            <div class="lbl">документов в пакете</div>
+          </div>
+        </div>
+        <p class="calc-disclaimer" style="margin-top:18px;">Расчёт ориентировочный. Точные сроки зависят от квоты, ведомства и полноты пакета документов — уточним при заявке.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= LEAD FORM ================= -->
+<section class="form-section" id="lead-form-section">
+  <div class="wrap">
+    <div class="form-shell reveal">
+      <div class="form-shell-head">
+        <h2>Готовы легально оформить сотрудника без рисков?</h2>
+        <span class="mono">ФОРМА № MIGR-06</span>
+      </div>
+
+      <form id="lead-form"
+            name="lead-form"
+            method="post"
+            data-webhook-url=""
+            aria-describedby="form-note">
+        <div class="form-row two">
+          <div class="field">
+            <label for="company">Название компании</label>
+            <input type="text" id="company" name="company" required autocomplete="organization">
+          </div>
+          <div class="field">
+            <label for="nationality">Гражданство иностранного специалиста</label>
+            <select id="nationality" name="nationality" required>
+              <option value="" disabled selected>Выберите</option>
+              <option value="cis">Страны СНГ</option>
+              <option value="ru">Россия</option>
+              <option value="far">Дальнее зарубежье</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="field">
+            <label for="service">Требуемый тип услуги</label>
+            <select id="service" name="service" required>
+              <option value="" disabled selected>Выберите</option>
+              <option value="irs">Разрешение на ИРС</option>
+              <option value="visa">Деловая / рабочая виза</option>
+              <option value="invite">Официальное приглашение</option>
+              <option value="reg">Миграционный учёт</option>
+              <option value="audit">Аудит документации</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row two">
+          <div class="field">
+            <label for="contact-name">Контактное лицо</label>
+            <input type="text" id="contact-name" name="contact_name" required autocomplete="name">
+          </div>
+          <div class="field">
+            <label for="phone">Телефон</label>
+            <input type="tel" id="phone" name="phone" required autocomplete="tel">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="field">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" required autocomplete="email">
+          </div>
+        </div>
+
+        <div class="form-footer-row">
+          <p class="form-privacy" id="form-note">Отправляя форму, вы соглашаетесь с политикой обработки персональных данных.</p>
+          <button type="submit" class="btn btn-stamp">Отправить заявку</button>
+        </div>
+      </form>
+
+      <div id="form-success">
+        <div class="success-stamp mono">ПРИНЯТО</div>
+        <h3>Заявка зарегистрирована</h3>
+        <p>Мы свяжемся с вами в течение рабочего дня, чтобы уточнить детали и сроки оформления.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= FAQ ================= -->
+<section id="faq">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="field-code">Раздел 07 · Вопросы бизнеса</span>
+      <h2>Частые вопросы</h2>
+    </div>
+
+    <div class="faq-list reveal">
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          <span class="qnum mono">01</span>
+          <span class="qtext">Как рассчитывается квота на привлечение иностранной рабочей силы?</span>
+          <span class="qicon">+</span>
+        </button>
+        <div class="faq-a">
+          <div class="faq-a-inner">Квота устанавливается ежегодно на уровне региона и распределяется по отраслям. Мы проверяем актуальный остаток квоты по вашему региону и виду деятельности до подачи заявления.</div>
+        </div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          <span class="qnum mono">02</span>
+          <span class="qtext">Сколько времени занимает полное оформление сотрудника?</span>
+          <span class="qicon">+</span>
+        </button>
+        <div class="faq-a">
+          <div class="faq-a-inner">В среднем от 10 до 30 рабочих дней в зависимости от гражданства сотрудника и набора требуемых документов. Точные сроки покажет калькулятор выше или менеджер после заявки.</div>
+        </div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          <span class="qnum mono">03</span>
+          <span class="qtext">Какую ответственность несёт работодатель в Казахстане?</span>
+          <span class="qicon">+</span>
+        </button>
+        <div class="faq-a">
+          <div class="faq-a-inner">Работодатель отвечает за законность привлечения и пребывания иностранного сотрудника на всём сроке трудовых отношений, включая своевременное продление документов и уведомление госорганов.</div>
+        </div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          <span class="qnum mono">04</span>
+          <span class="qtext">Что будет, если срок действия документов истечёт?</span>
+          <span class="qicon">+</span>
+        </button>
+        <div class="faq-a">
+          <div class="faq-a-inner">Это влечёт штрафы для компании и риск депортации сотрудника. Мы отслеживаем сроки действия документов и заранее уведомляем о необходимости продления.</div>
+        </div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          <span class="qnum mono">05</span>
+          <span class="qtext">Можно ли передать заявки напрямую в вашу CRM?</span>
+          <span class="qicon">+</span>
+        </button>
+        <div class="faq-a">
+          <div class="faq-a-inner">Да, форма заявки на этой странице готова к подключению через API или webhook — интеграция настраивается на боевом домене без изменения разметки.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= FOOTER ================= -->
+<footer>
+  <div class="wrap">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <span class="brand-mark" style="border-color:#D8B564; color:#D8B564;">V</span>
+        VisaRK
+      </div>
+      <div class="footer-links">
+        <a href="#solutions">Услуги</a>
+        <a href="#calculator">Расчёт сроков</a>
+        <a href="#faq">Вопросы</a>
+        <a href="#lead-form-section">Заявка</a>
+        <a href="#">Политика конфиденциальности</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© <span id="year"></span> VisaRK. Все права защищены.</span>
+      <span>г. Шымкент, Республика Казахстан</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  // registration number in letterhead
+  var now = new Date();
+  var pad = function(n){ return String(n).padStart(2,'0'); };
+  var reg = 'ЗАЯВКА-' + now.getFullYear() + '-' + pad(now.getMonth()+1) + pad(now.getDate());
+  var regEl = document.getElementById('regNumber');
+  if(regEl){ regEl.textContent = '№ ' + reg; }
+
+  var yearEl = document.getElementById('year');
+  if(yearEl){ yearEl.textContent = now.getFullYear(); }
+
+  // scroll reveal
+  var revealEls = document.querySelectorAll('.reveal');
+  if('IntersectionObserver' in window){
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if(entry.isIntersecting){
+          entry.target.classList.add('is-visible');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15 });
+    revealEls.forEach(function(el){ io.observe(el); });
+  } else {
+    revealEls.forEach(function(el){ el.classList.add('is-visible'); });
+  }
+
+  // FAQ accordion
+  document.querySelectorAll('.faq-item').forEach(function(item){
+    var btn = item.querySelector('.faq-q');
+    var panel = item.querySelector('.faq-a');
+    btn.addEventListener('click', function(){
+      var isOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item.open').forEach(function(openItem){
+        if(openItem !== item){
+          openItem.classList.remove('open');
+          openItem.querySelector('.faq-a').style.maxHeight = null;
+          openItem.querySelector('.faq-q').setAttribute('aria-expanded','false');
+        }
+      });
+      if(isOpen){
+        item.classList.remove('open');
+        panel.style.maxHeight = null;
+        btn.setAttribute('aria-expanded','false');
+      } else {
+        item.classList.add('open');
+        panel.style.maxHeight = panel.scrollHeight + 'px';
+        btn.setAttribute('aria-expanded','true');
+      }
+    });
+  });
+
+  // calculator
+  var calcData = {
+    irs:   { cis: [15, 6], ru: [12, 5],  far: [25, 8] },
+    visa:  { cis: [5, 3],  ru: [3, 2],   far: [10, 6] },
+    invite:{ cis: [4, 2],  ru: [3, 2],   far: [7, 4]  },
+    reg:   { cis: [1, 2],  ru: [1, 2],   far: [3, 3]  }
+  };
+  var natSelect = document.getElementById('calc-nationality');
+  var docSelect = document.getElementById('calc-doctype');
+  var daysOut = document.getElementById('calc-days');
+  var docsOut = document.getElementById('calc-docs');
+
+  function updateCalc(){
+    var doc = docSelect.value;
+    var nat = natSelect.value;
+    var entry = calcData[doc] && calcData[doc][nat];
+    if(entry){
+      daysOut.textContent = entry[0];
+      docsOut.textContent = entry[1];
+    }
+  }
+  if(natSelect && docSelect){
+    natSelect.addEventListener('change', updateCalc);
+    docSelect.addEventListener('change', updateCalc);
+    updateCalc();
+  }
+
+  // lead form submit — front-end demo only, ready for CRM webhook wiring
+  var form = document.getElementById('lead-form');
+  var successBox = document.getElementById('form-success');
+  if(form){
+    form.addEventListener('submit', function(e){
+      e.preventDefault();
+      var payload = Object.fromEntries(new FormData(form).entries());
+      // Placeholder for future CRM integration, e.g.:
+      // fetch(form.dataset.webhookUrl, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+      console.log('Lead captured (demo, not sent anywhere):', payload);
+      form.classList.add('hide');
+      successBox.classList.add('show');
+    });
+  }
+})();
+</script>
+</body>
+</html>
