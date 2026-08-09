@@ -450,10 +450,8 @@
             <div class="form-grid">
               <div class="field"><label>Клиент (компания-заказчик)</label><select id="f_client"></select></div>
               <div class="field"><label>Ответственный менеджер</label><select id="f_manager"></select></div>
-              <div class="field"><label>Тип визы</label>
-                <select id="f_visatype">
-                  <option>Рабочая, однократная</option><option>Рабочая, многократная</option><option>Деловая, однократная</option><option>Деловая, многократная</option>
-                </select>
+              <div class="field"><label>Тип визы / разрешения</label>
+                <select id="f_visatype"></select>
               </div>
               <div class="field"><label>Город консульского учреждения</label><input type="text" id="f_city" value="Шымкент"></div>
               <div class="field"><label>Плановая дата въезда</label><input type="date" id="f_entry"></div>
@@ -474,6 +472,11 @@
           <br><br>
           Система проверяет срок действия паспорта: если до истечения осталось менее 6 месяцев, дальнейший переход по этапам заявки будет заблокирован.
           <div class="stamp-mini" id="livePassportStatus">Укажите срок действия паспорта</div>
+        </aside>
+
+        <aside class="side-note" id="anketaChecklist">
+          <h4>Нужные документы</h4>
+          <div class="ref-empty">Выберите тип визы, чтобы увидеть чек-лист из справочника</div>
         </aside>
       </div>
     </section>
@@ -742,9 +745,11 @@ const courierTasks = [
   {appId:"VZ-0998", courier:"Гульжан Ахметова", pickupAddress:"г. Шымкент, офис клиента — ТОО «СтройИнвест Казахстан»", pickupDate:"2026-07-10", submitDate:"2026-07-10", collected:true, collectedDate:"2026-07-17"}
 ];
 
+const TODAY = "2026-08-07";
+
 function monthsUntil(dateStr){
   if(!dateStr) return Infinity;
-  const now = new Date("2026-08-07");
+  const now = new Date(TODAY);
   const d = new Date(dateStr);
   return (d - now) / (1000*60*60*24*30.44);
 }
@@ -754,8 +759,6 @@ function fmtDate(s){
   const [y,m,d] = s.split("-");
   return `${d}.${m}.${y}`;
 }
-
-const TODAY = "2026-08-07";
 
 // Прибавляет N рабочих дней к дате (пропускает субботу/воскресенье)
 function addBusinessDays(dateStr, days){
@@ -829,7 +832,7 @@ function renderKanban(){
         </div>
         <div class="card-meta mono">#${a.id} · ${a.client.length>28 ? a.client.slice(0,26)+'…' : a.client}</div>
         <div class="card-row">
-          <span class="badge badge-visa">${a.visaType.split(',')[0]}</span>
+          <span class="badge badge-visa">${a.visaCode || a.visaType.split(',')[0]}</span>
           ${a.track ? `<span class="track">${a.track}</span>` : `<span class="badge ${warn?'badge-warn':'badge-ok'}">${warn?'СРОК ПАСПОРТА':'ОК'}</span>`}
         </div>
         <div class="card-row">
@@ -888,11 +891,60 @@ function openModal(a){
       ? `<div class="stamp-big" style="background:var(--stamp-red-bg); color:var(--stamp-red);">⛔ ВАЛИДАТОР: паспорт истекает менее чем через 6 мес — переход заблокирован</div>`
       : `<div class="stamp-big" style="background:var(--success-bg); color:var(--success);">✔ Срок действия паспорта в норме</div>`
     }
+    ${(()=>{
+      const idx = columns.findIndex(c=>c.key===a.stage);
+      const next = idx>=0 && idx<columns.length-1 ? columns[idx+1] : null;
+      if(!next){
+        return `<div class="form-actions"><span class="form-error" style="color:var(--success);">✔ Финальный этап — заявка завершена</span></div>`;
+      }
+      return `<div class="form-actions">
+        <button class="btn-primary" onclick="moveToNextStage('${a.id}')">Перевести на этап «${next.title}» →</button>
+        <span class="form-error" id="modalMoveError"></span>
+      </div>`;
+    })()}
   `;
   document.getElementById('overlay').classList.add('active');
 }
 function closeModal(){ document.getElementById('overlay').classList.remove('active'); }
 document.getElementById('overlay').addEventListener('click', e=>{ if(e.target.id==='overlay') closeModal(); });
+
+// Переводит заявку на следующий этап воронки.
+// Валидатор: с этапа «Новая заявка» переход блокируется, если паспорт истекает менее чем через 6 месяцев.
+function moveToNextStage(appId){
+  const a = applications.find(x=>x.id===appId);
+  if(!a) return;
+
+  if(a.stage === 'new'){
+    const mo = monthsUntil(a.citizen.expiry);
+    if(mo < 6){
+      const errEl = document.getElementById('modalMoveError');
+      if(errEl) errEl.textContent = '⛔ Переход заблокирован: паспорт истекает менее чем через 6 мес.';
+      return;
+    }
+  }
+
+  const idx = columns.findIndex(c=>c.key===a.stage);
+  if(idx === -1 || idx === columns.length-1) return;
+  const next = columns[idx+1].key;
+  a.stage = next;
+
+  // При переходе на этап «Подача и согласование» — автоматически заводим курьерскую задачу
+  if(next === 'submit' && !courierTasks.find(t=>t.appId===a.id)){
+    courierTasks.unshift({
+      appId: a.id,
+      courier: a.manager ? managers[a.manager] : "Не назначен",
+      pickupAddress: `г. Шымкент, офис клиента — ${a.client}`,
+      pickupDate: TODAY,
+      submitDate: null,
+      collected: false
+    });
+  }
+
+  renderKanban();
+  renderCourier();
+  updateNavCounts();
+  closeModal();
+}
 
 function renderCitizens(){
   const body = document.getElementById('citizensBody');
@@ -991,6 +1043,28 @@ function populateAnketaSelects(){
   const managerSel = document.getElementById('f_manager');
   managerSel.innerHTML = '<option value="">— не назначен —</option>' +
     Object.entries(managers).map(([code,name])=>`<option value="${code}">${name}</option>`).join('');
+
+  const visaSel = document.getElementById('f_visatype');
+  const visaTypes = docReference.filter(r=>r.category==="Визы");
+  visaSel.innerHTML = visaTypes.map(r=>`<option value="${r.code}|${r.variant}">${r.code} — ${r.variant}</option>`).join('');
+  visaSel.addEventListener('change', renderAnketaChecklist);
+  renderAnketaChecklist();
+}
+
+function renderAnketaChecklist(){
+  const box = document.getElementById('anketaChecklist');
+  const val = document.getElementById('f_visatype').value;
+  const [code, variant] = val.split('|');
+  const ref = docReference.find(r=>r.code===code && r.variant===variant);
+  if(!ref){
+    box.innerHTML = '<h4>Нужные документы</h4><div class="ref-empty">Тип не найден в справочнике</div>';
+    return;
+  }
+  box.innerHTML = `
+    <h4>Нужные документы <span class="ref-tag">${ref.code}</span></h4>
+    <ul class="ref-list">${ref.documents.map(d=>`<li>${d}</li>`).join('')}</ul>
+    ${ref.note ? `<div class="ref-note">${ref.note}</div>` : ''}
+  `;
 }
 
 function generateAppId(){
@@ -1038,6 +1112,7 @@ document.getElementById('anketaReset').addEventListener('click', ()=>{
   document.getElementById('anketaForm').reset();
   document.getElementById('f_city').value = 'Шымкент';
   checkExpiryLive();
+  renderAnketaChecklist();
   document.getElementById('anketaError').textContent = '';
 });
 
@@ -1064,11 +1139,14 @@ document.getElementById('anketaForm').addEventListener('submit', (e)=>{
   };
   citizens.push(newCitizen);
 
+  const [visaCode, visaVariant] = document.getElementById('f_visatype').value.split('|');
+
   const newApp = {
     id: generateAppId(),
     citizen: newCitizen,
     stage: "new",
-    visaType: document.getElementById('f_visatype').value,
+    visaType: visaVariant,
+    visaCode: visaCode,
     manager: document.getElementById('f_manager').value,
     client: document.getElementById('f_client').value || "—",
     entryCity: document.getElementById('f_city').value || "Шымкент"
@@ -1084,6 +1162,7 @@ document.getElementById('anketaForm').addEventListener('submit', (e)=>{
   document.getElementById('anketaForm').reset();
   document.getElementById('f_city').value = 'Шымкент';
   checkExpiryLive();
+  renderAnketaChecklist();
   window.scrollTo({top:0, behavior:'smooth'});
   setTimeout(()=>document.getElementById('anketaSuccess').classList.remove('active'), 6000);
 });
