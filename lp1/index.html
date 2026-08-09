@@ -398,17 +398,12 @@
     background:var(--card);
     border:1px solid var(--line);
     padding:34px 28px;
-    display:grid;
-    grid-template-columns:1fr;
-    gap:28px;
+    display:flex;
+    flex-direction:column;
+    gap:26px;
+    max-width:640px;
   }
   .calc-panel > *{min-width:0;}
-  .calc-fields{
-    display:grid;
-    grid-template-columns:1fr;
-    gap:18px;
-    min-width:0;
-  }
   .field{
     display:flex; flex-direction:column; gap:8px;
     min-width:0;
@@ -439,13 +434,14 @@
     flex-wrap:wrap;
     gap:32px;
   }
-  .calc-stat{min-width:120px;}
+  .calc-stat{min-width:0; flex:1 1 140px; max-width:100%;}
   .calc-stat .num{
     font-family:'IBM Plex Mono', monospace;
-    font-size:34px;
+    font-size:clamp(18px, 4vw, 30px);
     font-weight:600;
     color:var(--stamp);
-    line-height:1;
+    line-height:1.15;
+    word-break:break-word;
   }
   .calc-stat .lbl{
     margin-top:8px;
@@ -787,44 +783,49 @@
   <div class="wrap">
     <div class="section-head reveal">
       <span class="field-code">Раздел 05 · Предварительный расчёт</span>
-      <h2>Оцените срок оформления</h2>
-      <p>Выберите гражданство сотрудника и нужный документ — покажем ориентировочные сроки.</p>
+      <h2>Оцените пакет документов</h2>
+      <p>Выберите нужный документ — покажем состав пакета по нашему справочнику. Сроки указываем там, где они зафиксированы; для остальных уточняем индивидуально.</p>
     </div>
 
     <div class="calc-panel reveal">
-      <div class="calc-fields">
-        <div class="field">
-          <label for="calc-nationality">Гражданство сотрудника</label>
-          <select id="calc-nationality">
-            <option value="cis">Узбекистан / Кыргызстан / Таджикистан</option>
-            <option value="ru">Россия</option>
-            <option value="far">Индия / Турция / Китай / другое дальнее зарубежье</option>
-          </select>
-        </div>
-        <div class="field">
-          <label for="calc-doctype">Требуемый документ</label>
-          <select id="calc-doctype">
-            <option value="irs">Разрешение на ИРС</option>
-            <option value="visa">Деловая / рабочая виза (C3, C4)</option>
-            <option value="invite">Официальное приглашение</option>
-            <option value="reg">Постановка на миграционный учёт</option>
-          </select>
-        </div>
+      <div class="field">
+        <label for="calc-service">Тип визы / документа</label>
+        <select id="calc-service">
+          <optgroup label="ИРС и деловые визы">
+            <option value="irs">ИРС — разрешение на привлечение</option>
+            <option value="c3_irs">C3 — виза по разрешению ИРС</option>
+            <option value="c3_director">C3 — виза для директора / зам. директора</option>
+            <option value="c5_invite">C5 — приглашение (90 дней, однократная)</option>
+            <option value="c5_multi">C5 — виза (полгода, многократная)</option>
+            <option value="b2_multi">B2 — виза (90/180 дней, многократная)</option>
+            <option value="b2_single">B2 — виза (30/90 дней, однократная)</option>
+            <option value="b2_e">B2 — электронная виза (30/90 дней)</option>
+            <option value="b3">B3 — виза (30 дней, однократная)</option>
+            <option value="a5">A5 — виза (3 года, многократная)</option>
+          </optgroup>
+          <optgroup label="Миграционный учёт и бизнес">
+            <option value="reg3">Миграционный учёт — на 3 месяца</option>
+            <option value="reg1y">Миграционный учёт — на 1 год</option>
+            <option value="too">Открытие ТОО (физлицом)</option>
+          </optgroup>
+        </select>
       </div>
 
-      <div>
-        <div class="calc-result">
-          <div class="calc-stat">
-            <div class="num" id="calc-days">—</div>
-            <div class="lbl">рабочих дней, ориентировочно</div>
-          </div>
-          <div class="calc-stat">
-            <div class="num" id="calc-docs">—</div>
-            <div class="lbl">документов в пакете</div>
-          </div>
+      <div class="calc-result">
+        <div class="calc-stat">
+          <div class="num" id="calc-docs">—</div>
+          <div class="lbl">документов в пакете</div>
         </div>
-        <p class="calc-disclaimer" style="margin-top:18px;">Расчёт ориентировочный. Точные сроки зависят от квоты, ведомства и полноты пакета документов — уточним при заявке.</p>
+        <div class="calc-stat">
+          <div class="num" id="calc-cost">—</div>
+          <div class="lbl" id="calc-cost-lbl">стоимость услуги</div>
+        </div>
+        <div class="calc-stat">
+          <div class="num" id="calc-days">—</div>
+          <div class="lbl">рабочих дней</div>
+        </div>
       </div>
+      <p class="calc-disclaimer">Состав пакета — из нашего справочника документов. Сроки и стоимость, не отмеченные в справочнике, уточняем индивидуально при заявке.</p>
     </div>
   </div>
 </section>
@@ -1045,30 +1046,39 @@
     });
   });
 
-  // calculator
+  // calculator — figures sourced from the client's document reference file
+  // (перечень документов.xlsx). docs = count of items in that visa/permit's
+  // checklist sheet. cost/days are included only where the source states them;
+  // everything else is left as "уточняется индивидуально" rather than guessed.
   var calcData = {
-    irs:   { cis: [15, 6], ru: [12, 5],  far: [25, 8] },
-    visa:  { cis: [5, 3],  ru: [3, 2],   far: [10, 6] },
-    invite:{ cis: [4, 2],  ru: [3, 2],   far: [7, 4]  },
-    reg:   { cis: [1, 2],  ru: [1, 2],   far: [3, 3]  }
+    irs:         { docs: 5,  cost: null,               days: null },
+    c3_irs:      { docs: 8,  cost: null,               days: null },
+    c3_director: { docs: 11, cost: null,               days: null },
+    c5_invite:   { docs: 6,  cost: null,               days: null },
+    c5_multi:    { docs: 7,  cost: null,               days: null },
+    b2_multi:    { docs: 7,  cost: '150 000 ₸ + 0,5 МРП', days: null },
+    b2_single:   { docs: 6,  cost: '150 000 ₸ + 0,5 МРП', days: null },
+    b2_e:        { docs: 7,  cost: '150 000 ₸ + 42 000 ₸', days: null },
+    b3:          { docs: 7,  cost: '120 000 ₸ + 7 МРП',  days: '5–10' },
+    a5:          { docs: 8,  cost: '400 000 ₸ + 30 МРП', days: null },
+    reg3:        { docs: 10, cost: null,               days: null },
+    reg1y:       { docs: 12, cost: null,               days: null },
+    too:         { docs: 5,  cost: null,               days: null }
   };
-  var natSelect = document.getElementById('calc-nationality');
-  var docSelect = document.getElementById('calc-doctype');
+  var serviceSelect = document.getElementById('calc-service');
   var daysOut = document.getElementById('calc-days');
   var docsOut = document.getElementById('calc-docs');
+  var costOut = document.getElementById('calc-cost');
 
   function updateCalc(){
-    var doc = docSelect.value;
-    var nat = natSelect.value;
-    var entry = calcData[doc] && calcData[doc][nat];
-    if(entry){
-      daysOut.textContent = entry[0];
-      docsOut.textContent = entry[1];
-    }
+    var entry = calcData[serviceSelect.value];
+    if(!entry) return;
+    docsOut.textContent = entry.docs;
+    costOut.textContent = entry.cost ? entry.cost : 'по запросу';
+    daysOut.textContent = entry.days ? entry.days : 'инд.';
   }
-  if(natSelect && docSelect){
-    natSelect.addEventListener('change', updateCalc);
-    docSelect.addEventListener('change', updateCalc);
+  if(serviceSelect){
+    serviceSelect.addEventListener('change', updateCalc);
     updateCalc();
   }
 
