@@ -7,7 +7,6 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <style>
-    /* Предотвращение горизонтального скролла всей страницы на мобильных */
     html, body {
       max-width: 100vw;
       overflow-x: hidden;
@@ -28,7 +27,7 @@
 
   <!-- Sidebar Desktop -->
   <aside class="hidden md:flex flex-col w-64 bg-slate-900 text-slate-300 min-h-screen p-4 border-r border-slate-800 flex-shrink-0">
-    <div class="flex items-center gap-3 mb-8 px-2">
+    <div class="flex items-center gap-3 mb-6 px-2">
       <div class="w-9 h-9 rounded-lg bg-blue-600 text-white flex items-center justify-center font-bold text-base shadow">W2</div>
       <div>
         <h1 class="font-bold text-white text-sm leading-tight">W2KZ CRM</h1>
@@ -36,16 +35,18 @@
       </div>
     </div>
     
+    <!-- Sidebar Navigation Menu -->
+    <div class="text-[10px] font-semibold uppercase tracking-wider text-slate-500 px-3 mb-2">Навигация</div>
     <nav class="space-y-1 flex-1" id="desktopNav"></nav>
 
     <div class="pt-4 border-t border-slate-800 text-[11px] text-slate-500 flex items-center justify-between">
-      <span>W2KZ Core v3.2</span>
+      <span>W2KZ Core v3.5</span>
       <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
     </div>
   </aside>
 
   <!-- Main Area -->
-  <div class="flex-1 flex flex-col min-w-0 h-full overflow-y-auto">
+  <div class="flex-1 flex flex-col min-w-0 h-full overflow-y-auto pb-16 md:pb-0">
     
     <!-- Header -->
     <header class="bg-white border-b border-slate-200 px-4 py-3 flex flex-wrap items-center justify-between gap-3 sticky top-0 z-20 shadow-sm">
@@ -136,48 +137,75 @@
       currentTab: 'kanban'
     };
 
+    // Full Navigation Structure per Role
     const rolesConfig = {
       director: {
         badge: 'bg-purple-100 text-purple-800',
         badgeText: 'Руководитель',
-        banner: 'Полный доступ: финансовые показатели, доходность и аналитика производство.',
+        banner: 'Полный доступ: финансовые показатели, маржинальность и аналитика.',
         btnText: 'Новое дело',
-        tabs: [{ id: 'kanban', label: 'Производство & Финансы', icon: 'fa-chart-pie' }]
+        tabs: [
+          { id: 'analytics', label: 'Дашборд & Финансы', icon: 'fa-chart-pie' },
+          { id: 'kanban', label: 'Ход производства', icon: 'fa-layer-group' },
+          { id: 'reports', label: 'Отчеты по марже', icon: 'fa-file-invoice-dollar' },
+          { id: 'settings', label: 'Настройки доступа', icon: 'fa-sliders' }
+        ]
       },
       manager: {
         badge: 'bg-blue-100 text-blue-800',
         badgeText: 'Менеджер',
         banner: 'Управление сделками, сбор первичных документов и работа с клиентами.',
         btnText: 'Создать сделку',
-        tabs: [{ id: 'kanban', label: 'Канбан сделок', icon: 'fa-table-columns' }]
+        tabs: [
+          { id: 'kanban', label: 'Канбан сделок', icon: 'fa-table-columns' },
+          { id: 'clients', label: 'База компаний (ТОО)', icon: 'fa-building' },
+          { id: 'tasks', label: 'Мои задачи', icon: 'fa-list-check' },
+          { id: 'docs', label: 'Шаблоны документов', icon: 'fa-file-lines' }
+        ]
       },
       lawyer: {
         badge: 'bg-amber-100 text-amber-800',
         badgeText: 'Юрист',
         banner: 'Правовая экспертиза, квотирование МИО и согласования МИД/МВД.',
         btnText: 'Добавить дело',
-        tabs: [{ id: 'kanban', label: 'Реестр согласований', icon: 'fa-scale-balanced' }]
+        tabs: [
+          { id: 'kanban', label: 'Реестр согласований', icon: 'fa-scale-balanced' },
+          { id: 'mio-quotas', label: 'Квоты МИО (Акимат)', icon: 'fa-landmark' },
+          { id: 'mid-requests', label: 'Запросы МИД / МВД', icon: 'fa-passport' },
+          { id: 'archive', label: 'Архив закрытых дел', icon: 'fa-box-archive' }
+        ]
       },
       employer: {
         badge: 'bg-emerald-100 text-emerald-800',
         badgeText: 'Работодатель',
         banner: 'Кабинет ТОО: Мониторинг статуса оформления зарубежных специалистов.',
         btnText: 'Заявка на визу',
-        tabs: [{ id: 'portal', label: 'Мои сотрудники', icon: 'fa-users' }]
+        tabs: [
+          { id: 'portal', label: 'Мои сотрудники', icon: 'fa-users' },
+          { id: 'applications', label: 'Поданные заявки', icon: 'fa-paper-plane' },
+          { id: 'invoices', label: 'Счета и оплата', icon: 'fa-receipt' }
+        ]
       },
       foreigner: {
         badge: 'bg-indigo-100 text-indigo-800',
         badgeText: 'Соискатель',
         banner: 'Персональный трекер статуса вашей рабочей визы.',
         btnText: 'Загрузить фото',
-        tabs: [{ id: 'foreigner-view', label: 'Статус заявки', icon: 'fa-id-card' }]
+        tabs: [
+          { id: 'foreigner-view', label: 'Статус заявки', icon: 'fa-id-card' },
+          { id: 'my-documents', label: 'Мои документы', icon: 'fa-folder-open' },
+          { id: 'support', label: 'Инструкции и чат', icon: 'fa-circle-question' }
+        ]
       },
       courier: {
         badge: 'bg-rose-100 text-rose-800',
         badgeText: 'Курьер',
         banner: 'Модуль доставки: Маршрутный лист по забору и передаче документов.',
         btnText: 'Обновить список',
-        tabs: [{ id: 'courier-view', label: 'Задания', icon: 'fa-motorcycle' }]
+        tabs: [
+          { id: 'courier-view', label: 'Маршрутный лист', icon: 'fa-motorcycle' },
+          { id: 'history', label: 'История доставок', icon: 'fa-clock-rotate-left' }
+        ]
       }
     };
 
@@ -193,7 +221,6 @@
       const conf = rolesConfig[role];
       state.currentTab = conf.tabs[0].id;
 
-      // Update UI Header Elements
       const badgeEl = document.getElementById('roleBadge');
       badgeEl.className = `text-xs px-2.5 py-1 rounded-md font-semibold ${conf.badge}`;
       badgeEl.innerText = conf.badgeText;
@@ -231,20 +258,20 @@
       conf.tabs.forEach(tab => {
         const isActive = tab.id === state.currentTab;
 
-        // Desktop
+        // Desktop Button
         const dBtn = document.createElement('button');
         dBtn.onclick = () => { state.currentTab = tab.id; renderNav(); renderWorkspace(); };
         dBtn.className = `w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium text-left transition ${
-          isActive ? 'bg-blue-600 text-white' : 'text-slate-400 hover:bg-slate-800 hover:text-white'
+          isActive ? 'bg-blue-600 text-white font-semibold' : 'text-slate-400 hover:bg-slate-800 hover:text-white'
         }`;
-        dBtn.innerHTML = `<i class="fa-solid ${tab.icon} w-4 text-center"></i> ${tab.label}`;
+        dBtn.innerHTML = `<i class="fa-solid ${tab.icon} w-4 text-center"></i> <span>${tab.label}</span>`;
         dNav.appendChild(dBtn);
 
-        // Mobile
+        // Mobile Button
         const mBtn = document.createElement('button');
         mBtn.onclick = () => { state.currentTab = tab.id; renderNav(); renderWorkspace(); };
-        mBtn.className = `flex flex-col items-center justify-center w-full py-1 ${isActive ? 'text-blue-400 font-bold' : 'text-slate-400'}`;
-        mBtn.innerHTML = `<i class="fa-solid ${tab.icon} text-base mb-0.5"></i><span class="text-[10px]">${tab.label}</span>`;
+        mBtn.className = `flex flex-col items-center justify-center flex-1 py-1 ${isActive ? 'text-blue-400 font-bold' : 'text-slate-400'}`;
+        mBtn.innerHTML = `<i class="fa-solid ${tab.icon} text-sm mb-0.5"></i><span class="text-[9px] truncate max-w-[65px]">${tab.label}</span>`;
         mNav.appendChild(mBtn);
       });
     }
@@ -252,24 +279,45 @@
     function renderWorkspace() {
       const ws = document.getElementById('workspace');
 
-      if (state.currentTab === 'kanban') {
-        ws.innerHTML = renderKanban();
-      } else if (state.currentTab === 'portal') {
-        ws.innerHTML = renderEmployerPortal();
-      } else if (state.currentTab === 'foreigner-view') {
-        ws.innerHTML = renderForeignerTracker();
-      } else if (state.currentTab === 'courier-view') {
-        ws.innerHTML = renderCourierTasks();
+      // Routing Map
+      switch (state.currentTab) {
+        case 'kanban':
+          ws.innerHTML = renderKanban();
+          break;
+        case 'analytics':
+          ws.innerHTML = renderAnalyticsView();
+          break;
+        case 'reports':
+          ws.innerHTML = renderReportsView();
+          break;
+        case 'clients':
+          ws.innerHTML = renderClientsView();
+          break;
+        case 'tasks':
+          ws.innerHTML = renderTasksView();
+          break;
+        case 'portal':
+          ws.innerHTML = renderEmployerPortal();
+          break;
+        case 'foreigner-view':
+          ws.innerHTML = renderForeignerTracker();
+          break;
+        case 'courier-view':
+          ws.innerHTML = renderCourierTasks();
+          break;
+        default:
+          ws.innerHTML = renderPlaceholderView(state.currentTab);
       }
     }
 
+    // View Renderers
     function renderKanban() {
       return `
         <div class="kanban-scroll w-full gap-3 md:gap-4 pb-6">
           ${stagesConfig.map(stage => {
             const items = state.cases.filter(c => c.stage === stage.id);
             return `
-              <div class="kanban-col w-[85vw] sm:w-[280px] md:w-1/4 bg-slate-200/70 rounded-xl p-3 flex flex-col max-h-[calc(100vh-160px)]">
+              <div class="kanban-col w-[85vw] sm:w-[280px] md:w-1/4 bg-slate-200/70 rounded-xl p-3 flex flex-col max-h-[calc(100vh-170px)]">
                 <div class="flex justify-between items-center mb-3 px-1">
                   <span class="font-bold text-xs text-slate-700 uppercase tracking-wider">${stage.name}</span>
                   <span class="bg-slate-300 text-slate-700 text-xs px-2 py-0.5 rounded-full font-bold">${items.length}</span>
@@ -305,7 +353,7 @@
             <span class="text-[11px] font-bold text-slate-700">${c.price.toLocaleString()} ₸</span>
             ${c.stage !== 'done' ? `
               <button onclick="moveCaseStage('${c.id}')" class="bg-blue-600 hover:bg-blue-700 text-white text-[11px] px-2.5 py-1 rounded font-medium transition">
-                Следующий этап <i class="fa-solid fa-arrow-right text-[9px] ml-1"></i>
+                Дальше <i class="fa-solid fa-arrow-right text-[9px] ml-1"></i>
               </button>
             ` : '<span class="text-[10px] text-emerald-600 font-bold"><i class="fa-solid fa-check"></i> Завершено</span>'}
           </div>`;
@@ -320,6 +368,122 @@
           <h4 class="font-bold text-slate-800 text-sm leading-tight">${c.name}</h4>
           <p class="text-xs text-slate-500">${c.company}</p>
           ${roleSpecificContent}
+        </div>
+      `;
+    }
+
+    function renderAnalyticsView() {
+      const totalRev = state.cases.reduce((sum, c) => sum + c.price, 0);
+      const totalMargin = state.cases.reduce((sum, c) => sum + c.margin, 0);
+
+      return `
+        <div class="space-y-4 max-w-5xl mx-auto">
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+              <span class="text-xs text-slate-500 font-medium">Общая выручка</span>
+              <h3 class="text-xl font-bold text-slate-900 mt-1">${totalRev.toLocaleString()} ₸</h3>
+            </div>
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+              <span class="text-xs text-slate-500 font-medium">Чистая маржа</span>
+              <h3 class="text-xl font-bold text-emerald-600 mt-1">${totalMargin.toLocaleString()} ₸</h3>
+            </div>
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+              <span class="text-xs text-slate-500 font-medium">Конверсия в выдачу</span>
+              <h3 class="text-xl font-bold text-blue-600 mt-1">94.2%</h3>
+            </div>
+          </div>
+
+          <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-3">
+            <h4 class="font-bold text-slate-800 text-sm">Сводка по типам виз</h4>
+            <div class="space-y-2 text-xs">
+              <div>
+                <div class="flex justify-between mb-1"><span>Рабочие визы (C3)</span><span class="font-mono font-bold">65%</span></div>
+                <div class="w-full bg-slate-100 rounded-full h-2"><div class="bg-blue-600 h-2 rounded-full w-[65%]"></div></div>
+              </div>
+              <div>
+                <div class="flex justify-between mb-1"><span>Деловые визы (B1)</span><span class="font-mono font-bold">25%</span></div>
+                <div class="w-full bg-slate-100 rounded-full h-2"><div class="bg-amber-500 h-2 rounded-full w-[25%]"></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderReportsView() {
+      return `
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden max-w-5xl mx-auto">
+          <div class="p-4 border-b border-slate-200 font-bold text-sm text-slate-800">Финансовый отчет по сделкам</div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-slate-50 text-slate-500 uppercase tracking-wider">
+                <tr>
+                  <th class="p-3">ID</th>
+                  <th class="p-3">Клиент</th>
+                  <th class="p-3">Компания</th>
+                  <th class="p-3">Стоимость</th>
+                  <th class="p-3">Маржа</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100">
+                ${state.cases.map(c => `
+                  <tr>
+                    <td class="p-3 font-mono text-slate-400">${c.id}</td>
+                    <td class="p-3 font-bold text-slate-800">${c.name}</td>
+                    <td class="p-3 text-slate-600">${c.company}</td>
+                    <td class="p-3">${c.price.toLocaleString()} ₸</td>
+                    <td class="p-3 text-emerald-600 font-bold">${c.margin.toLocaleString()} ₸</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderClientsView() {
+      return `
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 max-w-5xl mx-auto">
+          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-2">
+            <span class="text-[10px] bg-slate-100 text-slate-600 font-mono px-2 py-0.5 rounded">БИН 120440019283</span>
+            <h4 class="font-bold text-slate-900 text-sm">ТОО "Азия СпецСтрой"</h4>
+            <p class="text-xs text-slate-500">Контактное лицо: Марат Ахметов (+7 701 555-01-02)</p>
+            <div class="pt-2 border-t border-slate-100 flex justify-between text-xs">
+              <span>Активных виз: <strong>4</strong></span>
+              <span class="text-blue-600 font-medium cursor-pointer">Карточка ТОО &rarr;</span>
+            </div>
+          </div>
+          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-2">
+            <span class="text-[10px] bg-slate-100 text-slate-600 font-mono px-2 py-0.5 rounded">БИН 180940028190</span>
+            <h4 class="font-bold text-slate-900 text-sm">АО "Fintech Solutions"</h4>
+            <p class="text-xs text-slate-500">Контактное лицо: Елена Пак (+7 777 300-11-22)</p>
+            <div class="pt-2 border-t border-slate-100 flex justify-between text-xs">
+              <span>Активных виз: <strong>2</strong></span>
+              <span class="text-blue-600 font-medium cursor-pointer">Карточка ТОО &rarr;</span>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderTasksView() {
+      return `
+        <div class="max-w-2xl mx-auto space-y-2">
+          <div class="bg-white p-3 rounded-lg border border-slate-200 flex items-center justify-between text-xs">
+            <div class="flex items-center gap-2">
+              <input type="checkbox" class="rounded text-blue-600">
+              <span>Запросить нотариальный перевод паспорта (Чжан Вэй)</span>
+            </div>
+            <span class="text-[10px] bg-rose-50 text-rose-700 px-2 py-0.5 rounded font-bold">Сегодня</span>
+          </div>
+          <div class="bg-white p-3 rounded-lg border border-slate-200 flex items-center justify-between text-xs">
+            <div class="flex items-center gap-2">
+              <input type="checkbox" class="rounded text-blue-600">
+              <span>Выставить счет за визовый сбор для АО "Fintech"</span>
+            </div>
+            <span class="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded">Завтра</span>
+          </div>
         </div>
       `;
     }
@@ -379,8 +543,8 @@
           </div>
 
           <div class="pt-2 border-t border-slate-100">
-            <button onclick="alert('Документ отправлен на проверку юристу')" class="w-full bg-slate-900 text-white text-xs font-medium py-2.5 rounded-lg">
-              <i class="fa-solid fa-upload mr-1"></i> Загрузить новую копию паспорта
+            <button onclick="alert('Документ отправлен на проверку')" class="w-full bg-slate-900 text-white text-xs font-medium py-2.5 rounded-lg">
+              <i class="fa-solid fa-upload mr-1"></i> Загрузить копию паспорта
             </button>
           </div>
         </div>
@@ -402,7 +566,7 @@
               <p class="font-bold text-slate-800 text-sm">${c.courierTask}</p>
               <p class="text-xs text-slate-500">Клиент: ${c.name} (${c.company})</p>
               <button onclick="completeCourierTask('${c.id}')" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs py-2 rounded-lg font-medium transition">
-                <i class="fa-solid fa-check mr-1"></i> Отметить как выполненное
+                <i class="fa-solid fa-check mr-1"></i> Выполнено
               </button>
             </div>
           `).join('')}
@@ -410,11 +574,22 @@
       `;
     }
 
-    // Interactive Actions & Logic
+    function renderPlaceholderView(tabId) {
+      return `
+        <div class="max-w-xl mx-auto bg-white p-8 rounded-2xl border border-slate-200 text-center space-y-3 shadow-sm">
+          <div class="w-12 h-12 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center mx-auto text-xl">
+            <i class="fa-solid fa-folder-open"></i>
+          </div>
+          <h3 class="font-bold text-slate-800 text-base">Раздел "${tabId}" загружен</h3>
+          <p class="text-xs text-slate-500">Реестр синхронизирован с базой данных W2KZ Enterprise.</p>
+        </div>
+      `;
+    }
+
+    // Actions
     function moveCaseStage(id) {
       const item = state.cases.find(c => c.id === id);
       if (!item) return;
-
       const stageOrder = ['docs', 'mio', 'mid', 'done'];
       const currentIndex = stageOrder.indexOf(item.stage);
       if (currentIndex < stageOrder.length - 1) {
@@ -427,7 +602,6 @@
     function advanceLegalStatus(id) {
       const item = state.cases.find(c => c.id === id);
       if (!item) return;
-
       const statuses = ['Проверка документов', 'Подано в Акимат', 'Согласование МВД/МИД', 'Виза одобрена'];
       const currentIdx = statuses.indexOf(item.legalStatus);
       item.legalStatus = statuses[(currentIdx + 1) % statuses.length];
@@ -447,7 +621,7 @@
       if (['director', 'manager', 'lawyer', 'employer'].includes(state.currentRole)) {
         openModal('modalCase');
       } else {
-        alert('Запрос отправлен в систему.');
+        alert('Запрос зафиксирован в системе.');
       }
     }
 
