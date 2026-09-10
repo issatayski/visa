@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>W2KZ — CRM Рабочие Визы РК</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans min-h-screen flex flex-col md:flex-row pb-16 md:pb-0">
+
+  <!-- Sidebar (Desktop) -->
+  <aside class="hidden md:flex flex-col w-64 bg-slate-900 text-white min-h-screen p-4 border-r border-slate-800">
+    <div class="flex items-center gap-3 mb-8 px-2">
+      <div class="w-10 h-10 rounded-lg bg-blue-600 flex items-center justify-center font-bold text-xl">W2</div>
+      <div>
+        <h1 class="font-bold text-lg leading-none">W2KZ CRM</h1>
+        <span class="text-xs text-slate-400">Визы в Казахстан</span>
+      </div>
+    </div>
+    
+    <nav class="space-y-1 flex-1">
+      <button onclick="switchTab('kanban')" id="nav-kanban" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left bg-blue-600 text-white font-medium transition">
+        <i class="fa-solid fa-list-check w-5"></i> Kanban Производство
+      </button>
+      <button onclick="switchTab('chats')" id="nav-chats" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left text-slate-400 hover:bg-slate-800 hover:text-white transition">
+        <i class="fa-solid fa-comments w-5"></i> Мессенджеры
+      </button>
+      <button onclick="switchTab('courier')" id="nav-courier" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left text-slate-400 hover:bg-slate-800 hover:text-white transition">
+        <i class="fa-solid fa-truck-fast w-5"></i> Курьерская PWA
+      </button>
+    </nav>
+
+    <div class="pt-4 border-t border-slate-800 text-xs text-slate-500">
+      W2KZ v1.0 • Визовый центр РК
+    </div>
+  </aside>
+
+  <!-- Main Content Area -->
+  <main class="flex-1 flex flex-col min-w-0">
+    <!-- Top Bar -->
+    <header class="bg-white border-b border-slate-200 px-4 py-3 flex flex-wrap items-center justify-between gap-4 sticky top-0 z-20">
+      <div class="flex items-center gap-3">
+        <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">Текущая роль:</span>
+        <select id="roleSelector" onchange="changeRole(this.value)" class="bg-slate-50 border border-slate-300 rounded-lg text-sm px-3 py-1.5 font-medium text-slate-700 focus:ring-2 focus:ring-blue-500 outline-none">
+          <option value="director">👑 Руководитель</option>
+          <option value="manager" selected>💼 Менеджер</option>
+          <option value="lawyer">⚖️ Юрист</option>
+          <option value="employer">🏢 Работодатель</option>
+          <option value="foreigner">🌐 Иностранец</option>
+          <option value="courier">🛵 Курьер</option>
+        </select>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <button class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-lg flex items-center gap-2 transition">
+          <i class="fa-solid fa-plus"></i> Новая заявка
+        </button>
+      </div>
+    </header>
+
+    <!-- View 1: Kanban Board -->
+    <section id="view-kanban" class="tab-content p-4 md:p-6 overflow-x-auto flex-1">
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="text-xl font-bold text-slate-900">Визовое производство РК</h2>
+        <span class="text-sm text-slate-500">Всего дел в работе: 12</span>
+      </div>
+
+      <div class="flex gap-4 min-w-[1000px] pb-4">
+        <!-- Column 1 -->
+        <div class="w-1/4 bg-slate-200/60 rounded-xl p-3 flex flex-col">
+          <div class="flex justify-between items-center mb-3">
+            <span class="font-bold text-slate-700 text-sm flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-slate-400"></span> Сбор документов
+            </span>
+            <span class="bg-slate-300 text-slate-700 text-xs px-2 py-0.5 rounded-full font-bold">3</span>
+          </div>
+          <div class="space-y-3 flex-1">
+            <div class="bg-white p-3.5 rounded-lg shadow-sm border border-slate-200 hover:shadow-md transition cursor-pointer">
+              <div class="flex justify-between text-xs text-slate-400 mb-1">
+                <span>#KZ-8041</span>
+                <span class="text-amber-600 font-medium">Категория C3</span>
+              </div>
+              <h4 class="font-bold text-slate-800 text-sm mb-1">Чжан Вэй (Инженер)</h4>
+              <p class="text-xs text-slate-500 mb-3">ТОО "Азия СпецСтрой"</p>
+              <div class="flex justify-between items-center pt-2 border-t border-slate-100 text-xs text-slate-500">
+                <span><i class="fa-regular fa-clock"></i> 2 дня</span>
+                <span class="bg-blue-50 text-blue-600 px-2 py-0.5 rounded text-[11px] font-medium">Менеджер</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Column 2 -->
+        <div class="w-1/4 bg-slate-200/60 rounded-xl p-3 flex flex-col">
+          <div class="flex justify-between items-center mb-3">
+            <span class="font-bold text-slate-700 text-sm flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span> Подача в МИО (Квота)
+            </span>
+            <span class="bg-slate-300 text-slate-700 text-xs px-2 py-0.5 rounded-full font-bold">4</span>
+          </div>
+          <div class="space-y-3 flex-1">
+            <div class="bg-white p-3.5 rounded-lg shadow-sm border border-slate-200 hover:shadow-md transition cursor-pointer">
+              <div class="flex justify-between text-xs text-slate-400 mb-1">
+                <span>#KZ-7912</span>
+                <span class="text-amber-600 font-medium">Категория C3</span>
+              </div>
+              <h4 class="font-bold text-slate-800 text-sm mb-1">Джон Смит (IT-архитектор)</h4>
+              <p class="text-xs text-slate-500 mb-3">АО "Fintech Solutions"</p>
+              <div class="flex justify-between items-center pt-2 border-t border-slate-100 text-xs text-slate-500">
+                <span><i class="fa-regular fa-clock"></i> 5 дней</span>
+                <span class="bg-purple-50 text-purple-600 px-2 py-0.5 rounded text-[11px] font-medium">Юрист</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Column 3 -->
+        <div class="w-1/4 bg-slate-200/60 rounded-xl p-3 flex flex-col">
+          <div class="flex justify-between items-center mb-3">
+            <span class="font-bold text-slate-700 text-sm flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span> Согласование МИД/МВД
+            </span>
+            <span class="bg-slate-300 text-slate-700 text-xs px-2 py-0.5 rounded-full font-bold">3</span>
+          </div>
+          <div class="space-y-3 flex-1">
+            <div class="bg-white p-3.5 rounded-lg shadow-sm border border-slate-200 hover:shadow-md transition cursor-pointer">
+              <div class="flex justify-between text-xs text-slate-400 mb-1">
+                <span>#KZ-7703</span>
+                <span class="text-blue-600 font-medium">Разрешение №44</span>
+              </div>
+              <h4 class="font-bold text-slate-800 text-sm mb-1">Мухаммад Али (Технолог)</h4>
+              <p class="text-xs text-slate-500 mb-3">ТОО "КазХимПром"</p>
+              <div class="flex justify-between items-center pt-2 border-t border-slate-100 text-xs text-slate-500">
+                <span><i class="fa-regular fa-clock"></i> 1 день</span>
+                <span class="bg-amber-50 text-amber-600 px-2 py-0.5 rounded text-[11px] font-medium">Курьер</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Column 4 -->
+        <div class="w-1/4 bg-slate-200/60 rounded-xl p-3 flex flex-col">
+          <div class="flex justify-between items-center mb-3">
+            <span class="font-bold text-slate-700 text-sm flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Виза Выдана
+            </span>
+            <span class="bg-slate-300 text-slate-700 text-xs px-2 py-0.5 rounded-full font-bold">2</span>
+          </div>
+          <div class="space-y-3 flex-1">
+            <div class="bg-white p-3.5 rounded-lg shadow-sm border border-slate-200 border-l-4 border-l-emerald-500">
+              <div class="flex justify-between text-xs text-slate-400 mb-1">
+                <span>#KZ-7100</span>
+                <span class="text-emerald-600 font-medium">Готово</span>
+              </div>
+              <h4 class="font-bold text-slate-800 text-sm mb-1">Сергей Петров</h4>
+              <p class="text-xs text-slate-500 mb-1">ТОО "АгроСервис"</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- View 2: Messenger Module -->
+    <section id="view-chats" class="tab-content hidden p-4 md:p-6 flex-1 flex flex-col">
+      <h2 class="text-xl font-bold text-slate-900 mb-4">Интеграция с Мессенджерами</h2>
+      <div class="bg-white rounded-xl border border-slate-200 flex-1 flex overflow-hidden min-h-[450px]">
+        <div class="w-1/3 border-r border-slate-200 p-3 space-y-2">
+          <div class="p-3 bg-blue-50 rounded-lg border border-blue-100 cursor-pointer">
+            <div class="flex justify-between items-center mb-1">
+              <span class="font-bold text-sm text-slate-800">Чжан Вэй</span>
+              <span class="text-xs text-slate-400">14:20</span>
+            </div>
+            <p class="text-xs text-slate-500 truncate">Отправил скан паспорта для визы...</p>
+          </div>
+        </div>
+        <div class="w-2/3 p-4 flex flex-col justify-between bg-slate-50">
+          <div class="space-y-3">
+            <div class="bg-white p-3 rounded-lg border text-sm max-w-md shadow-sm">Здравствуйте! Я загрузил новый паспорт в систему.</div>
+            <div class="bg-blue-600 text-white p-3 rounded-lg text-sm max-w-md ml-auto shadow-sm">Добрый день! Паспорт принят, передали юристу для подачи в МИО.</div>
+          </div>
+          <div class="mt-4 flex gap-2">
+            <input type="text" placeholder="Введите сообщение..." class="flex-1 border rounded-lg px-3 py-2 text-sm outline-none">
+            <button class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium">Отправить</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- View 3: Courier PWA -->
+    <section id="view-courier" class="tab-content hidden p-4 md:p-6 flex-1">
+      <h2 class="text-xl font-bold text-slate-900 mb-4">PWA Модуль Доставки Документов</h2>
+      <div class="max-w-md mx-auto bg-white rounded-xl border p-4 space-y-4 shadow-sm">
+        <div class="border-b pb-3 flex justify-between items-center">
+          <div>
+            <span class="text-xs text-slate-400">Задание №48</span>
+            <h3 class="font-bold">Забрать паспорта из ЦОН</h3>
+          </div>
+          <span class="bg-amber-100 text-amber-700 text-xs px-2.5 py-1 rounded-full font-bold">В пути</span>
+        </div>
+        <p class="text-xs text-slate-600"><i class="fa-solid fa-location-dot text-red-500"></i> г. Астана, ул. Достык 13 -> МИД РК</p>
+        <button onclick="alert('Статус обновлен: Документы доставлены!')" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2.5 rounded-lg font-medium text-sm transition">
+          <i class="fa-solid fa-check"></i> Отметить как доставлено
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <!-- Mobile Bottom Navigation -->
+  <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-slate-900 text-white border-t border-slate-800 flex justify-around py-2 z-30">
+    <button onclick="switchTab('kanban')" class="flex flex-col items-center text-xs text-blue-400">
+      <i class="fa-solid fa-list-check text-base"></i>
+      <span>Канбан</span>
+    </button>
+    <button onclick="switchTab('chats')" class="flex flex-col items-center text-xs text-slate-400">
+      <i class="fa-solid fa-comments text-base"></i>
+      <span>Чаты</span>
+    </button>
+    <button onclick="switchTab('courier')" class="flex flex-col items-center text-xs text-slate-400">
+      <i class="fa-solid fa-truck-fast text-base"></i>
+      <span>Курьер</span>
+    </button>
+  </nav>
+
+  <script>
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.getElementById('view-' + tabName).classList.remove('hidden');
+    }
+
+    function changeRole(role) {
+      console.log("Смена роли на:", role);
+    }
+  </script>
+</body>
+</html>
